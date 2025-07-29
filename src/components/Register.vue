@@ -619,6 +619,9 @@ h2 {
 /* Input group styles */
 .input-group {
   margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
 }
 
 .input-group label {
@@ -644,6 +647,7 @@ h2 {
   font-size: 1rem;
   transition: all 0.3s ease;
   background-color: #f8f9fa;
+  box-sizing: border-box;
 }
 
 .input-group input:focus,
@@ -959,6 +963,10 @@ h2 {
     width: 120px;
     height: 120px;
   }
+
+  .input-group {
+    min-height: 90px; 
+  }
 }
 
 @media (max-width: 480px) {
@@ -978,6 +986,11 @@ h2 {
   .file-upload-label {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
+  }
+
+   .input-group input,
+  .input-group textarea {
+    padding: 0.75rem;
   }
 }
 </style>
