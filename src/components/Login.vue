@@ -157,7 +157,9 @@ async function handleLogin() {
     userName.value = user.fullName;
   
     // Arahkan ke halaman utama
-     router.push('/');
+   router.push('/').then(() => {
+  window.location.reload(); 
+});
 
   } catch (err) {
     error.value = err.response?.data?.message || 'Username atau password salah.';
