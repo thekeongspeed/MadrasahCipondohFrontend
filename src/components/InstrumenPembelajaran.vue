@@ -711,7 +711,7 @@ function formatSimpleDate(tanggal) {
 // Fungsi untuk mendapatkan daftar file
 const fetchUploadedFiles = async () => {
   try {
-    const response = await axios.get(`/api/instrumen/${activeKelas.value}/${activeInstrument.value}/files`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/instrumen/${activeKelas.value}/${activeInstrument.value}/files`, {
       headers: { 
         'Authorization': `Bearer ${token.value}` 
       }
@@ -748,7 +748,7 @@ async function fetchInstrumentData(kelas, jenis) {
   loadingState.value[key] = true;
   
   try {
-    const response = await axios.get(`/api/instrumen/${kelas}/${jenis}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/instrumen/${kelas}/${jenis}`, {
       headers: { 
         'Authorization': `Bearer ${token.value}` 
       }
@@ -801,7 +801,7 @@ const handleFileUpload = async (event) => {
     formData.append('kelas', activeKelas.value);
     formData.append('jenis', activeInstrument.value);
 
-    const response = await axios.post('/api/instrumen', formData, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/instrumen`, formData, {
       headers: { 
         'Authorization': `Bearer ${token.value}`,
         'Content-Type': 'multipart/form-data'
@@ -838,7 +838,7 @@ const deleteFile = async (id) => {
   if (!id || !confirm('Anda yakin ingin menghapus file ini?')) return;
   
   try {
-    await axios.delete(`/api/instrumen/${id}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/instrumen/${id}`, {
       headers: { 'Authorization': `Bearer ${token.value}` }
     });
     
@@ -1023,7 +1023,7 @@ const attendanceRate = computed(() => {
 
 async function fetchSiswaByKelas(kelas) {
   try {
-    const response = await axios.get(`/api/users/kelas/${kelas}`, { 
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users/kelas/${kelas}`, { 
       headers: { 'Authorization': `Bearer ${token.value}` }
     });
     raportSiswaList.value = response.data.map(user => ({ ...user, id: user.id }));
@@ -1115,7 +1115,7 @@ async function tambahNilaiRaport() {
       keterangan: newNilai.value.keterangan
     };
 
-    const response = await axios.post('/api/raport', payload, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/raport`, payload, {
       headers: { 'Authorization': `Bearer ${token.value}` }
     });
     
@@ -1142,7 +1142,7 @@ async function hapusNilaiRaport(nilaiId) {
   if (!confirm('Anda yakin ingin menghapus data nilai ini?', 'info')) return;
 
   try {
-    await axios.delete(`/api/raport/${currentRaport.value.id}/nilai/${nilaiId}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/raport/${currentRaport.value.id}/nilai/${nilaiId}`, {
       headers: { 'Authorization': `Bearer ${token.value}` }
     });
     
@@ -1216,7 +1216,7 @@ const fetchMateriForKelas = async (kelas) => {
   }
 
   try {
-    const response = await axios.get(`/api/template/${kelas}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/template/${kelas}`, {
       headers: { 'Authorization': `Bearer ${token.value}` }
     });
     materiList.value = response.data;
@@ -1241,7 +1241,7 @@ const saveCatatanGuru = async () => {
     return;
   }
   try {
-    await axios.put(`/api/raport/${currentRaport.value.id}/catatan`, 
+    await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/raport/${currentRaport.value.id}/catatan`, 
       { catatanGuru: catatanGuru.value },
       { headers: { 'Authorization': `Bearer ${token.value}` } }
     );
@@ -1270,7 +1270,7 @@ const simpanPerubahan = async () => {
     const nilaiId = editingNilai.value.id;
     
     const response = await axios.put(
-      `/api/raport/${raportId}/nilai/${nilaiId}`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/raport/${raportId}/nilai/${nilaiId}`,
       editingNilai.value,
       { headers: { 'Authorization': `Bearer ${token.value}` } }
     );

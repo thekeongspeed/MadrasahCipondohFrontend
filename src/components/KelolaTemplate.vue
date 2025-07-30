@@ -161,7 +161,7 @@ const fetchKolom = async () => {
   if (!selectedKelas.value) return;
   loading.value = true;
   try {
-    const response = await axios.get(`/api/template/${selectedKelas.value}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/template/${selectedKelas.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     kolomList.value = response.data;

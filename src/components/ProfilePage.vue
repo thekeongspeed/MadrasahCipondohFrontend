@@ -298,7 +298,7 @@ async function uploadProfilePicture() {
   const token = localStorage.getItem('token');
   
   try {
-    const response = await axios.post(`${serverUrl}/api/profile/upload`, formData, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/profile/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`
@@ -321,7 +321,7 @@ async function fetchProfile() {
   const token = localStorage.getItem('token');
   
   try {
-    const response = await axios.get(`${serverUrl}/api/profile`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/profile`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
@@ -372,7 +372,7 @@ async function saveProfile() {
   isSaving.value = true; // Mulai loading
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.put('/api/profile', editableProfile.value, {
+    const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/profile`, editableProfile.value, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     

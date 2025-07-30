@@ -416,7 +416,7 @@ async function fetchUsers() {
   }
   
   try {
-    const response = await axios.get('/api/users', {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     users.value = response.data;
@@ -487,7 +487,7 @@ async function saveUserEdit() {
 
   try {
     const token = localStorage.getItem('token');
-    await axios.put(`/api/users/${userToEdit.value.id}`, dataToUpdate, {
+    await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/users/${userToEdit.value.id}`, dataToUpdate, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     alert('Data pengguna berhasil diperbarui!');
@@ -510,7 +510,7 @@ async function deleteUser(event, user) {
   }
   try {
     const token = localStorage.getItem('token');
-    await axios.delete(`/api/users/${userId}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/users/${userId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     alert('Pengguna berhasil dihapus.');

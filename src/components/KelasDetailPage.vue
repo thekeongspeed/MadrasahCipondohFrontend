@@ -638,7 +638,7 @@ const newJadwal = ref({
 async function fetchJadwal() {
   jadwalLoading.value = true;
   try {
-    const response = await axios.get(`/api/jadwal/${namaKelas.value}`, { 
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/jadwal/${namaKelas.value}`, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     jadwalList.value = response.data;
@@ -652,7 +652,7 @@ async function fetchJadwal() {
 
 async function addJadwal() {
   try {
-    const response = await axios.post('/api/jadwal', newJadwal.value, { 
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/jadwal`, newJadwal.value, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     jadwalList.value.push(response.data);
@@ -673,7 +673,7 @@ async function addJadwal() {
 async function deleteJadwal(id) {
   if (!confirm('Anda yakin ingin menghapus jadwal ini?')) return;
   try {
-    await axios.delete(`/api/jadwal/${id}`, { 
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/jadwal/${id}`, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     jadwalList.value = jadwalList.value.filter(item => item.id !== id);
@@ -701,7 +701,7 @@ const totalHari = computed(() => {
 
 async function fetchAllUsers() {
   try {
-    const response = await axios.get(`/api/users/kelas/${namaKelas.value}`, { 
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users/kelas/${namaKelas.value}`, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     userList.value = response.data;
@@ -715,7 +715,7 @@ async function fetchAbsensi() {
   absensiLoading.value = true;
   try {
       await fetchAllUsers();
-     const response = await axios.get(`/api/absensi/${namaKelas.value}/${selectedDate.value}`, {
+     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/absensi/${namaKelas.value}/${selectedDate.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
@@ -753,7 +753,7 @@ async function fetchAbsensiBulanan() {
   absensiLoading.value = true;
   try {
      await fetchAllUsers(); 
-    const response = await axios.get(`/api/absensi/rekap/${namaKelas.value}/${selectedMonth.value}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/absensi/rekap/${namaKelas.value}/${selectedMonth.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     absensiData.value = response.data;
@@ -767,7 +767,7 @@ async function fetchAbsensiBulanan() {
 
 async function saveAbsensi() {
   try {
-    await axios.post('/api/absensi', {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/absensi`, {
       kelas: namaKelas.value,
       tanggal: selectedDate.value,
       absensi: absensiList.value 
@@ -853,7 +853,7 @@ const showEmojiPicker = ref({});
 async function fetchPengumuman() {
   pengumumanLoading.value = true;
   try {
-    const response = await axios.get(`/api/pengumuman/${namaKelas.value}`, { 
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman/${namaKelas.value}`, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     pengumumanList.value = response.data;
@@ -874,7 +874,7 @@ async function addKomentar(pengumumanId) {
 
   try {
     await axios.post(
-      `/api/pengumuman/${pengumumanId}/komentar`, 
+      `${import.meta.env.VITE_API_BASE_URL}/api/pengumuman/${pengumumanId}/komentar`, 
       { isi: isiKomentar },
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
@@ -888,7 +888,7 @@ async function addKomentar(pengumumanId) {
 
 async function addPengumuman() {
   try {
-    await axios.post('/api/pengumuman', newPengumuman.value, {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman`, newPengumuman.value, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     newPengumuman.value.judul = '';
@@ -904,7 +904,7 @@ async function addPengumuman() {
 async function deletePengumuman(pengumumanId) {
   if (!confirm('Anda yakin ingin menghapus pengumuman ini?')) return;
   try {
-    await axios.delete(`/api/pengumuman/${pengumumanId}`, { 
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman/${pengumumanId}`, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     await fetchPengumuman();
@@ -916,7 +916,7 @@ async function deletePengumuman(pengumumanId) {
 
 async function saveEdit(pengumumanId) {
   try {
-    await axios.put(`/api/pengumuman/${pengumumanId}`, editablePengumuman.value, { 
+    await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman/${pengumumanId}`, editablePengumuman.value, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     cancelEdit();
@@ -956,7 +956,7 @@ async function deleteKomentar(pengumumanId, komentarId) {
   if (!confirm('Yakin ingin menghapus komentar ini?')) return;
   
   try {
-    await axios.delete(`/api/pengumuman/${pengumumanId}/komentar/${komentarId}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman/${pengumumanId}/komentar/${komentarId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     await fetchPengumuman();
@@ -990,7 +990,7 @@ async function fetchJurnalBulanan() {
   jurnalLoading.value = true;
 
   try {
-    const response = await axios.get(`/api/jurnal/rekap/${namaKelas.value}/${selectedJurnalMonth.value}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/jurnal/rekap/${namaKelas.value}/${selectedJurnalMonth.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const dataJurnal = response.data.data || []; 
@@ -1006,7 +1006,7 @@ async function fetchJurnalBulanan() {
 
 async function addJurnal() {
   try {
-    await axios.post('/api/jurnal', newJurnal.value, { 
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/jurnal`, newJurnal.value, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     newJurnal.value.materi = '';
@@ -1033,7 +1033,7 @@ function cancelJurnalEdit() {
 
 async function saveJurnalEdit(jurnalId) {
   try {
-    await axios.put(`/api/jurnal/${jurnalId}`, editableJurnal.value, { 
+    await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/jurnal/${jurnalId}`, editableJurnal.value, { 
       headers: { 'Authorization': `Bearer ${token}` }
     });
     cancelJurnalEdit();
@@ -1047,7 +1047,7 @@ async function saveJurnalEdit(jurnalId) {
 async function deleteJurnal(jurnalId) {
   if (!confirm('Anda yakin ingin menghapus jurnal ini?')) return;
   try {
-    await axios.delete(`/api/jurnal/${jurnalId}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/jurnal/${jurnalId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     await fetchJurnalBulanan();

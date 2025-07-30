@@ -393,7 +393,7 @@ async function handleRegister() {
   }
 
   try {
-    const response = await axios.post('/api/register', dataToSubmit, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/register`, dataToSubmit, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

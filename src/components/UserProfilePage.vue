@@ -109,7 +109,7 @@ async function fetchUserProfile() {
     loading.value = true;
     error.value = '';
     const userId = route.params.id;
-    const response = await axios.get(`${serverUrl}/api/users/profil/${userId}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users/profil/${userId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     user.value = response.data.data;
