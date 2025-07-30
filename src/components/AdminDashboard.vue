@@ -523,6 +523,15 @@ async function deleteUser(event, user) {
 
 
 
+const BACKEND_BASE_URL = 'https://madrasahcipondohbackend-production.up.railway.app';
+const profilePictureUrl = computed(() => {
+  const path = localStorage.getItem('userProfilePicture');
+  if (!path) return '/default-profile.png';
+  return path.startsWith('http') ? path : `${BACKEND_BASE_URL}${path}`;
+});
+
+
+
 const router = useRouter();
 onMounted(fetchUsers);
 </script>

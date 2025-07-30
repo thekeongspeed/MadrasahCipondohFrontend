@@ -741,7 +741,7 @@ const fetchUploadedFiles = async () => {
 function getFullFileUrl(filePath) {
 
   const baseURL = import.meta.env.VITE_API_BASE_URL; 
-  return `${baseURL}/${filePath}`; 
+  return `${baseURL}${filePath}`; 
 }
 
 
