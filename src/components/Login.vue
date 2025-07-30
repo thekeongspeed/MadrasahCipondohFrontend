@@ -153,6 +153,8 @@ async function handleLogin() {
     localStorage.setItem('userProfilePicture', user.profilePicture);
     localStorage.setItem('userParentName', user.parentName); 
 
+    userProfilePic.value = response.data.user.profilePicture;
+    userName.value = user.fullName;
   
     // Arahkan ke halaman utama
      router.push('/');
