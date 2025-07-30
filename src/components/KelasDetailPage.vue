@@ -260,140 +260,155 @@
                   <p>Belum ada pengumuman</p>
                 </div>
                 
-                <transition-group name="staggered-fade" tag="div">
-                  <div 
-                    v-for="(item, index) in pengumumanList" 
-                    :key="item.id" 
-                    class="announcement-card"
-                    :style="{ 'transition-delay': `${index * 0.05}s` }"
-                  >
-                    <div v-if="editingPengumumanId !== item.id">
+               <transition-group name="staggered-fade" tag="div">
+                  <template v-for="(item, index) in pengumumanList" :key="item.id">
+                    
+                    <div 
+                      v-if="item && item.createdByUser"
+                      class="announcement-card"
+                      :style="{ 'transition-delay': `${index * 0.05}s` }"
+                    >
+                      <div v-if="editingPengumumanId !== item.id">
+                        <div class="card-header">
+                          <div class="author-info">
+                            <img 
+                              :src="`${apiBaseUrl}${item.createdByUser.profilePicture || '/default-avatar.png'}`" 
+                              class="author-avatar"
+                              @error="handleImageError"
+                            >
+                            <div>
+                              <div class="post-meta">
+                                <router-link :to="`/profil/${item.createdByUser.id}`" class="author-name clickable">
+                                  {{ item.createdByUser.fullName || 'Admin' }}
+                                </router-link>
+                                <span class="post-date">{{ formatTanggal(item.createdAt) }}</span>
+                                <h3 class="announcement-title">{{ item.judul }}</h3>
+                              </div>
+                            </div>
+                          </div>
+                          <div v-if="isAdmin" class="card-actions">
+                            <button @click="enterEditMode(item)" class="icon-button edit"><i class="fas fa-edit"></i></button>
+                            <button @click="deletePengumuman(item.id)" class="icon-button delete"><i class="fas fa-trash"></i></button>
+                          </div>
+                        </div>
+                        <div class="card-content">
+                          <p class="announcement-text">{{ item.isi }}</p>
+                        </div>
+                        <div class="card-footer">
+                          <div class="comment-count">
+                            <i class="fas fa-comments"></i> {{ item.komentar.length }} Komentar
+                          </div>
+                          <button @click="toggleComments(item.id)" class="comment-toggle">
+                            {{ showComments[item.id] ? 'Sembunyikan' : 'Lihat' }} Komentar
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div v-else class="edit-view">
+                        <input v-model="editablePengumuman.judul" class="edit-input">
+                        <textarea v-model="editablePengumuman.isi" class="edit-textarea" rows="5"></textarea>
+                        <div class="edit-actions">
+                          <button @click="cancelEdit" class="styled-button cancel-button small">
+                            <i class="fas fa-times"></i> Batal
+                          </button>
+                          <button @click="saveEdit(item.id)" class="styled-button save-button small">
+                            <i class="fas fa-save"></i> Simpan
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <transition name="slide-down">
+                        <div v-if="showComments[item.id]" class="comments-section">
+                          <div class="comments-list">
+                            <div 
+                              v-for="komen in item.komentar" 
+                              :key="komen.id" 
+                              class="comment-item"
+                            >
+                              <div class="comment-header">
+                                <div class="comment-user">
+                                  <img 
+                                    :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-avatar.png'}`" 
+                                    class="comment-avatar"
+                                    @error="handleImageError"
+                                  >
+                                  <div class="comment-user-info">
+                                    <router-link :to="`/profil/${komen.author?.id}`" class="comment-author-name clickable">
+                                      <strong>{{ komen.author?.fullName || 'User Dihapus' }}</strong>
+                                    </router-link>
+                                    <span class="comment-time">{{ formatWaktuKomentar(komen.createdAt || komen.tanggal) }}</span>
+                                  </div>
+                                </div>
+                                <button 
+                                  v-if="isAdmin" 
+                                  @click="deleteKomentar(item.id, komen.id)" 
+                                  class="delete-comment-btn"
+                                  title="Hapus Komentar"
+                                >
+                                  <i class="fas fa-times"></i>
+                                </button>
+                              </div>
+                              <p class="comment-content">{{ komen.isi }}</p>
+                            </div>
+                          </div>
+                          
+                          <form @submit.prevent="addKomentar(item.id)" class="comment-form">
+                            <div class="input-with-emoji">
+                              <textarea 
+                                v-model="newKomentar[item.id]" 
+                                placeholder="Tulis komentar..."
+                                rows="2"
+                              ></textarea>
+                              <button 
+                                type="button" 
+                                @click="toggleEmojiPicker(item.id)" 
+                                class="emoji-button"
+                              >
+                                <i class="far fa-smile"></i>
+                              </button>
+                              <EmojiPicker 
+                                v-if="showEmojiPicker[item.id]" 
+                                :native="true" 
+                                @select="(emoji) => onSelectEmoji(item.id, emoji)" 
+                                class="emoji-picker"
+                              />
+                            </div>
+                            <div class="comment-action">
+                              <button type="submit" class="styled-button primary small">
+                                <i class="fas fa-paper-plane"></i> Kirim
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </transition>
+                    </div>
+
+                    <div 
+                      v-else-if="item"
+                      class="announcement-card"
+                      :style="{ 'transition-delay': `${index * 0.05}s` }"
+                    >
                       <div class="card-header">
                         <div class="author-info">
                           <img 
-                            :src="`${apiBaseUrl}${item.createdByUser?.profilePicture || '/default-avatar.png'}`" 
+                            src="/default-avatar.png" 
                             class="author-avatar"
-                            @error="handleImageError"
                           >
                           <div>
-                           
                             <div class="post-meta">
-                              <router-link :to="`/profil/${item.createdByUser?.id}`" class="author-name clickable">
-                                {{ item.createdByUser?.fullName || 'Admin' }}
-                              </router-link>
-                              
+                              <span class="author-name">Pengguna Dihapus</span>
                               <span class="post-date">{{ formatTanggal(item.createdAt) }}</span>
                               <h3 class="announcement-title">{{ item.judul }}</h3>
                             </div>
-                             
                           </div>
                         </div>
-                        <div v-if="isAdmin" class="card-actions">
-                          <button @click="enterEditMode(item)" class="icon-button edit">
-                            <i class="fas fa-edit"></i>
-                          </button>
-                          <button @click="deletePengumuman(item.id)" class="icon-button delete">
-                            <i class="fas fa-trash"></i>
-                          </button>
-                        </div>
                       </div>
-                      
                       <div class="card-content">
                         <p class="announcement-text">{{ item.isi }}</p>
                       </div>
-                      
-                      <div class="card-footer">
-                        <div class="comment-count">
-                          <i class="fas fa-comments"></i> {{ item.komentar.length }} Komentar
-                        </div>
-                        <button 
-                          @click="toggleComments(item.id)" 
-                          class="comment-toggle"
-                        >
-                          {{ showComments[item.id] ? 'Sembunyikan' : 'Lihat' }} Komentar
-                        </button>
-                      </div>
                     </div>
-                    
-                    <div v-else class="edit-view">
-                      <input v-model="editablePengumuman.judul" class="edit-input">
-                      <textarea v-model="editablePengumuman.isi" class="edit-textarea" rows="5"></textarea>
-                      <div class="edit-actions">
-                        <button @click="cancelEdit" class="styled-button cancel-button small">
-                          <i class="fas fa-times"></i> Batal
-                        </button>
-                        <button @click="saveEdit(item.id)" class="styled-button save-button small">
-                          <i class="fas fa-save"></i> Simpan
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <transition name="slide-down">
-                      <div v-if="showComments[item.id]" class="comments-section">
-                        <div class="comments-list">
-                          <div 
-                            v-for="komen in item.komentar" 
-                            :key="komen.id" 
-                            class="comment-item"
-                          >
-                            <div class="comment-header">
-                              <div class="comment-user">
-                                <img 
-                                  :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-avatar.png'}`" 
-                                  class="comment-avatar"
-                                  @error="handleImageError"
-                                >
-                                <div class="comment-user-info">
-                                 <router-link :to="`/profil/${komen.author?.id}`" class="comment-author-name clickable">
-                                  <strong>{{ komen.author?.fullName || 'User Dihapus' }}</strong>
-                                </router-link>
-                                  <span class="comment-time">{{ formatWaktuKomentar(komen.createdAt || komen.tanggal) }}</span>
-                                </div>
-                              </div>
-                              <button 
-                                v-if="isAdmin" 
-                                @click="deleteKomentar(item.id, komen.id)" 
-                                class="delete-comment-btn"
-                                title="Hapus Komentar"
-                              >
-                                <i class="fas fa-times"></i>
-                              </button>
-                            </div>
-                            <p class="comment-content">{{ komen.isi }}</p>
-                          </div>
-                        </div>
-                        
-                        <form @submit.prevent="addKomentar(item.id)" class="comment-form">
-                          <div class="input-with-emoji">
-                            <textarea 
-                              v-model="newKomentar[item.id]" 
-                              placeholder="Tulis komentar..."
-                              rows="2"
-                            ></textarea>
-                            <button 
-                              type="button" 
-                              @click="toggleEmojiPicker(item.id)" 
-                              class="emoji-button"
-                            >
-                              <i class="far fa-smile"></i>
-                            </button>
-                            <EmojiPicker 
-                              v-if="showEmojiPicker[item.id]" 
-                              :native="true" 
-                              @select="(emoji) => onSelectEmoji(item.id, emoji)" 
-                              class="emoji-picker"
-                            />
-                          </div>
-                          <div class="comment-action">
-                          <button type="submit" class="styled-button primary small">
-                            <i class="fas fa-paper-plane"></i> Kirim
-                          </button>
 
-                          </div>
-                        </form>
-                      </div>
-                    </transition>
-                  </div>
+                  </template>
                 </transition-group>
               </div>
             </div>
