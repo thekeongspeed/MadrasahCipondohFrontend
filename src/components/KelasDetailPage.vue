@@ -391,8 +391,9 @@
                       <div class="card-header">
                         <div class="author-info">
                           <img 
-                            src="/default-avatar.png" 
-                            class="author-avatar"
+                            :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-avatar.png'}`" 
+                                    class="comment-avatar"
+                                    @error="handleImageError"
                           >
                           <div>
                             <div class="post-meta">
