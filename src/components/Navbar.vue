@@ -240,7 +240,7 @@ const isLoggedIn = computed(() => !!localStorage.getItem('token'));
 const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin');
 
 const profilePictureUrl = computed(() => {
-  const path = localStorage.getItem('userProfilePicture');
+  const filename = localStorage.getItem('userProfilePicture');
   if (filename) {
     
     const baseURL = import.meta.env.VITE_API_BASE_URL; 
