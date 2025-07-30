@@ -133,7 +133,7 @@ async function handleLogin() {
   isLoading.value = true;
   
   try {
-    const response = await axios.post('${import.meta.env.VITE_API_BASE_URL}/api/login', {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
       username: username.value,
       password: password.value,
       remember:rememberMe.value
