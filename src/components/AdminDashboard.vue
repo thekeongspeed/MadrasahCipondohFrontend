@@ -104,8 +104,8 @@
                     <td data-label="Nama Lengkap" class="name-cell">
                       <div class="user-avatar">
                      <img 
-                          v-if="user.profilePictureUrl && user.profilePictureUrl !== '/default-profile.png'" 
-                          :src="user.profilePictureUrl" 
+                          v-if="user.profilePicture && user.profilePicture !== '/default-profile.png'" 
+                          :src="getProfilePictureUrl(user.profilePicture)" 
                           :alt="user.fullName">
                         <span v-else class="avatar-initial">{{ getInitials(user.fullName) }}</span>
                       </div>
@@ -128,8 +128,8 @@
                   <div class="card-header">
                     <div class="user-avatar">
                       <img 
-                          v-if="user.profilePictureUrl && user.profilePictureUrl !== '/default-profile.png'" 
-                          :src="user.profilePictureUrl" 
+                          v-if="user.profilePicture && user.profilePicture !== '/default-profile.png'" 
+                          :src="getProfilePictureUrl(user.profilePicture)" 
                           :alt="user.fullName">
                         <span v-else class="avatar-initial">{{ getInitials(user.fullName) }}</span>
                       </div>
@@ -523,13 +523,21 @@ async function deleteUser(event, user) {
 
 
 
-const BACKEND_BASE_URL = 'https://madrasahcipondohbackend-production.up.railway.app';
-const profilePictureUrl = computed(() => {
-  const path = localStorage.getItem('userProfilePicture');
-  if (!path) return '/default-profile.png';
-  return path.startsWith('http') ? path : `${BACKEND_BASE_URL}${path}`;
-});
+function getProfilePictureUrl(picturePath) {
 
+  if (!picturePath || picturePath === '/default-profile.png') {
+    return null; 
+  }
+
+  if (picturePath.startsWith('http')) {
+    return picturePath;
+  }
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+  // Gabungkan base URL dengan path gambar
+  // Pastikan tidak ada garis miring ganda (//)
+  return `${apiUrl.replace(/\/$/, '')}/${picturePath.replace(/^\//, '')}`;
+}
 
 
 const router = useRouter();
