@@ -241,7 +241,13 @@ const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin');
 
 const profilePictureUrl = computed(() => {
   const path = localStorage.getItem('userProfilePicture');
-  return path || '/default-profile.png';
+  if (filename) {
+    
+    const baseURL = import.meta.env.VITE_API_BASE_URL; 
+    return `${baseURL}/uploads/profiles/${filename}`;
+  }
+
+  return '/default-profile.png'; 
 });
 
 function logout() {
