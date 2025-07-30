@@ -104,8 +104,8 @@
                     <td data-label="Nama Lengkap" class="name-cell">
                       <div class="user-avatar">
                      <img 
-                          v-if="user.profilePicture && user.profilePicture !== '/default-profile.png'" 
-                          :src="user.profilePicture" 
+                          v-if="user.profilePictureUrl && user.profilePictureUrl !== '/default-profile.png'" 
+                          :src="user.profilePictureUrl" 
                           :alt="user.fullName">
                         <span v-else class="avatar-initial">{{ getInitials(user.fullName) }}</span>
                       </div>
@@ -128,8 +128,8 @@
                   <div class="card-header">
                     <div class="user-avatar">
                       <img 
-                          v-if="user.profilePicture && user.profilePicture !== '/default-profile.png'" 
-                          :src="user.profilePicture" 
+                          v-if="user.profilePictureUrl && user.profilePictureUrl !== '/default-profile.png'" 
+                          :src="user.profilePictureUrl" 
                           :alt="user.fullName">
                         <span v-else class="avatar-initial">{{ getInitials(user.fullName) }}</span>
                       </div>
