@@ -155,7 +155,7 @@ async function handleLogin() {
 
     // Arahkan ke halaman utama
    router.push('/').then(() => {
-  window.location.reload(); 
+   window.location.reload(); 
 });
 
   } catch (err) {
