@@ -240,14 +240,8 @@ const isLoggedIn = computed(() => !!localStorage.getItem('token'));
 const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin');
 
 const profilePictureUrl = computed(() => {
-  const filename = userProfilePic.value;
-  if (filename && filename !== 'null' && filename !== 'undefined') {
-    const baseURL = import.meta.env.VITE_API_BASE_URL;
-
-    return `${baseURL}/uploads/profiles/${filename}`;
-  }
-
-  return '/default-profile.png'; 
+  const path = localStorage.getItem('userProfilePicture');
+  return path || '/default-profile.png';
 });
 
 function logout() {
@@ -256,7 +250,6 @@ function logout() {
   localStorage.removeItem('userProfilePicture');
   localStorage.removeItem('userName');
   router.push('/login').then(() => window.location.reload());
-  userProfilePic.value = null;
 }
 
 function logoutAndCloseMenu() {
