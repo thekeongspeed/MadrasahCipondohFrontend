@@ -56,47 +56,68 @@
       </section>
 
       <!-- Location Section -->
-      <section class="location-section">
-        <transition name="fade-up" appear>
-          <div>
-            <h2><span class="title-icon">📍</span> Lokasi Kami</h2>
-            <div class="location-content">
-              <div class="address-details">
-                <div class="floating-mosque-icon">🕌</div>
-                <h3>Alamat Lengkap</h3>
-                <p>
-                  Jl. Irigasi Sipon RT.003/RW.008, Cipondoh, Kec. Cipondoh, Kota Tangerang, Banten 15146
-                </p>
-                <div class="contact-info">
-                  <p><span class="contact-icon">📞</span> <strong>Telepon:</strong> +62 838 - 7362 - 4774</p>
-                  <p><span class="contact-icon">✉️</span> <strong>Email:</strong> madrasah.cipondoh2425@gmail.com</p>
-                </div>
-                
-                <div class="map-container">
-                  <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15866.332704845705!2d106.66681746827743!3d-6.186496113232323!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f900a47ec923%3A0xa9b97d9f93033b16!2sMasjid%20Al%20Mubarokah%20Sipon%20(LDII)!5e0!3m2!1sid!2sid!4v1752637121750!5m2!1sid!2sid" 
-                    width="100%" 
-                    height="300" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy"
-                    class="map-iframe">
-                  </iframe>
-                </div>
-              </div>
-              
-              <div class="location-image">
-                <div class="image-frame" @mouseenter="startImageHover" @mouseleave="stopImageHover">
-                  <img 
-                    src="/foto-lokasi.png" 
-                    alt="Foto Lokasi Madrasah Cipondoh"
-                    :style="{ transform: `rotate(${imageRotation}deg) scale(${imageScale})` }">
-                </div>
-              </div>
+       <section class="location-section">
+    <transition name="fade-up" appear>
+      <div>
+        <h2><span class="title-icon">📍</span> Lokasi Kami</h2>
+        <div class="location-content">
+          <div class="address-details">
+            <div class="floating-mosque-icon">🕌</div>
+            <h3>Alamat Lengkap</h3>
+            <p class="address-text">
+              Jl. Irigasi Sipon RT.003/RW.008,
+              Cipondoh, Kec. Cipondoh,
+              Kota Tangerang, Banten 15146
+            </p>
+            <div class="contact-info">
+              <p>
+                <span class="contact-icon">📞</span> 
+                <span class="contact-detail">
+                  <strong>Telepon : </strong> 
+                  <a>+62 838 - 7362 - 4774</a>
+                </span>
+              </p>
+              <p>
+                <span class="contact-icon">✉️</span> 
+                <span class="contact-detail">
+                  <strong>Email : </strong> 
+                  <a>madrasah.cipondoh2425@gmail.com</a>
+                </span>
+              </p>
+            </div>
+            
+            <div class="map-container">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15866.332704845705!2d106.66681746827743!3d-6.186496113232323!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f900a47ec923%3A0xa9b97d9f93033b16!2sMasjid%20Al%20Mubarokah%20Sipon%20(LDII)!5e0!3m2!1sid!2sid!4v1752637121750!5m2!1sid!2sid" 
+                width="100%" 
+                height="300" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy"
+                class="map-iframe"
+                title="Peta Lokasi Madrasah Cipondoh">
+              </iframe>
+              <a href="https://maps.google.com/maps?q=Jl.+Irigasi+Sipon+RT.003/RW.008,+Cipondoh,+Kec.+Cipondoh,+Kota+Tangerang,+Banten+15146" 
+                 class="map-link" 
+                 target="_blank" 
+                 rel="noopener noreferrer">
+                Buka di Google Maps
+              </a>
             </div>
           </div>
-        </transition>
-      </section>
+          
+          <div class="location-image">
+            <div class="image-frame">
+              <img 
+                src="/foto-lokasi.png" 
+                alt="Foto Lokasi Madrasah Cipondoh">
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </section>
+
 
       <!-- Programs Section -->
       <section class="featured-programs">
@@ -137,8 +158,6 @@
           </div>
         </div>
       </section>
-      
-     
     </main>
     
     <!-- Lightbox Modal -->
@@ -268,7 +287,6 @@ const nextImage = () => {
 const prevImage = () => {
   lightboxIndex.value = (lightboxIndex.value - 1 + galleryImages.value.length) % galleryImages.value.length;
 };
-
 
 // Scroll to content
 const contentSection = ref(null);
@@ -552,15 +570,20 @@ h2::after {
   z-index: 1;
 }
 
-.address-details p {
+.address-text {
   line-height: 1.8;
   font-size: 1.1rem;
   position: relative;
   z-index: 1;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  text-align: left;
+  margin-bottom: 1.5rem;
 }
 
 .contact-info {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   font-size: 1.1rem;
   position: relative;
   z-index: 1;
@@ -569,12 +592,32 @@ h2::after {
 .contact-info p {
   margin: 1rem 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+  line-height: 1.6;
 }
 
 .contact-icon {
   font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.contact-link {
+  color: #014283;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  word-break: break-all;
+}
+
+.contact-link:hover {
+  color: #0277bd;
+  text-decoration: underline;
+}
+
+.contact-detail {
+  display: inline-block;
+  word-break: break-word;
 }
 
 .map-container {
@@ -582,16 +625,33 @@ h2::after {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .map-iframe {
   border: none;
   filter: grayscale(20%);
   transition: all 0.3s ease;
+  min-height: 300px;
+  width: 100%;
+  display: block;
 }
 
-.map-iframe:hover {
-  filter: grayscale(0%);
+.map-link {
+  display: block;
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: #014283;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.map-link:hover {
+  background-color: #0277bd;
 }
 
 .location-image {
@@ -684,7 +744,7 @@ h2::after {
 
 /* Gallery Section */
 .gallery-section {
-  text-align: center;
+  text-align: start;
 }
 
 .gallery-container {
@@ -738,7 +798,6 @@ h2::after {
 .gallery-item:hover .zoom-icon {
   transform: scale(1);
 }
-
 
 /* Lightbox */
 .lightbox {
@@ -871,6 +930,17 @@ h2::after {
   
   .location-content {
     grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .address-details {
+    padding: 1.5rem;
+  }
+  
+  .floating-mosque-icon {
+    font-size: 4rem;
+    right: 1rem;
+    top: -1.5rem;
   }
   
   .content-section {
@@ -883,6 +953,29 @@ h2::after {
   
   .program-card {
     padding: 2rem 1.5rem;
+  }
+
+  .address-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    padding: 0 0.5rem;
+  }
+  
+  .contact-info {
+    font-size: 1rem;
+  }
+  
+  .contact-info p {
+    flex-wrap: wrap;
+  }
+  
+  .map-iframe {
+    min-height: 250px;
+  }
+  
+  .map-link {
+    padding: 0.8rem 0.5rem;
+    font-size: 0.95rem;
   }
 }
 
@@ -907,8 +1000,56 @@ h2::after {
     grid-template-columns: 1fr 1fr;
   }
   
-  .testimonials-container {
-    grid-template-columns: 1fr;
+  .address-details {
+    padding: 1.5rem 1rem;
+  }
+  
+  .address-text {
+    font-size: 0.95rem;
+    padding: 0;
+  }
+  
+  .contact-info {
+    font-size: 0.95rem;
+  }
+  
+  .contact-link {
+    word-break: break-word;
+  }
+  
+  .map-iframe {
+    min-height: 220px;
+  }
+  
+  .map-link {
+    font-size: 0.9rem;
+    padding: 0.7rem 0.5rem;
+  }
+  
+  .location-image {
+    margin-top: 2rem;
+  }
+  
+  .image-frame {
+    border-width: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .address-text {
+    font-size: 0.9rem;
+  }
+  
+  .contact-info {
+    font-size: 0.9rem;
+  }
+  
+  .map-iframe {
+    min-height: 200px;
+  }
+  
+  .map-link {
+    font-size: 0.85rem;
   }
 }
 </style>
