@@ -33,7 +33,7 @@
               <div class="avatar-section">
                 <div class="avatar-wrapper">
                   <img 
-                    :src="serverUrl + profileData.profilePicture" 
+                    :src="fullProfilePictureUrl" 
                     alt="Foto Profil" 
                     class="profile-avatar"
                     @error="handleImageError"
@@ -110,7 +110,7 @@
             <div class="avatar-edit-section">
               <div class="avatar-edit-wrapper">
                 <img 
-                  :src="imagePreview || serverUrl + profileData.profilePicture" 
+                  :src="imagePreview || fullProfilePictureUrl"
                   alt="Preview Foto Profil" 
                   class="avatar-preview"
                 >
@@ -415,6 +415,16 @@ function handleLogout() {
     window.location.href = '/login';
   }
 }
+
+
+const fullProfilePictureUrl = computed(() => {
+   if (profileData.value && profileData.value.profilePicture) {
+        const baseUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+    return `${baseUrl}${profileData.value.profilePicture}`;
+  }
+
+  return ''; 
+});
 
 
 // Lifecycle hooks

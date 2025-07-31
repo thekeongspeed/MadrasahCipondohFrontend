@@ -569,7 +569,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import EmojiPicker from 'vue3-emoji-picker';
@@ -583,6 +583,7 @@ const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin');
 const token = localStorage.getItem('token');
 const loading = ref(false);
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const showNotification = inject('showNotification');
 
 // Enhanced class information
 const dataInfoKelas = {
@@ -682,6 +683,7 @@ async function addJadwal() {
     };
     showAddSchedule.value = false;
     // Show success notification
+    showNotification('Jadwal berhasil disimpan!', 'success');
   } catch (error) {
     console.error('Gagal menambah jadwal:', error);
     // Show error to user
@@ -696,6 +698,7 @@ async function deleteJadwal(id) {
     });
     jadwalList.value = jadwalList.value.filter(item => item.id !== id);
     // Show success notification
+    showNotification('Jadwal berhasil dihapus!', 'success');
   } catch (error) {
     console.error('Gagal menghapus jadwal:', error);
     // Show error to user
@@ -791,7 +794,7 @@ async function saveAbsensi() {
       absensi: absensiList.value 
     }, { headers: { 'Authorization': `Bearer ${token}` } });
     // Show success notification
-    alert('Absensi berhasil disimpan!');
+    showNotification('Absensi berhasil disimpan!');
   } catch (error) { 
     console.error('Gagal menyimpan absensi:', error);
     // Show error to user
@@ -937,6 +940,7 @@ async function addPengumuman() {
     newPengumuman.value.isi = '';
     pengumumanView.value = 'list';
     await fetchPengumuman();
+    showNotification('Pengumuman berhasil disimpan!', 'success');
   } catch (error) {
     console.error('Gagal membuat pengumuman:', error);
     // Show error to user
@@ -952,6 +956,7 @@ async function deletePengumuman(pengumumanId) {
       headers: { 'Authorization': `Bearer ${token}` } 
     });
     await fetchPengumuman();
+    showNotification('Pengumuman berhasil dihapus!', 'success');
   } catch (error) {
     console.error('Gagal menghapus pengumuman:', error);
     // Show error to user
@@ -967,6 +972,7 @@ async function saveEdit(pengumumanId) {
     });
     cancelEdit();
     await fetchPengumuman();
+    showNotification('Pengumuman berhasil diubah!', 'success');
   } catch (error) {
     console.error('Gagal menyimpan perubahan:', error);
     // Show error to user
@@ -1008,6 +1014,7 @@ async function deleteKomentar(pengumumanId, komentarId) {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     await fetchPengumuman();
+    showNotification('Komentar berhasil dihapus!', 'success');
   } catch (error) {
     console.error('Gagal menghapus komentar:', error);
     // Show error to user
@@ -1061,6 +1068,7 @@ async function addJurnal() {
     newJurnal.value.keterangan = '';
     jurnalView.value = 'laporan';
     await fetchJurnalBulanan();
+    showNotification('Jurnal berhasil disimpan!', 'success');
   } catch (error) {
     console.error('Gagal menyimpan jurnal:', error);
     // Show error to user
@@ -1086,6 +1094,7 @@ async function saveJurnalEdit(jurnalId) {
     });
     cancelJurnalEdit();
     await fetchJurnalBulanan();
+    showNotification('Jurnal berhasil diubah!', 'success');
   } catch (error) {
     console.error('Gagal menyimpan perubahan jurnal:', error);
     // Show error to user
@@ -1099,6 +1108,7 @@ async function deleteJurnal(jurnalId) {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     await fetchJurnalBulanan();
+    showNotification('Jurnal berhasil dihapus!', 'success');
   } catch (error) {
     console.error('Gagal menghapus jurnal:', error);
     // Show error to user

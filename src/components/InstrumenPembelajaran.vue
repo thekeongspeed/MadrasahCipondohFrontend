@@ -1053,6 +1053,7 @@ async function fetchRaportBySiswa() {
   raportData.value = [];
   catatanGuru.value = '';
   rekapAbsensiBulanIni.value = [];
+  waliKelas.value = '';
   
 
   try {
@@ -1078,27 +1079,46 @@ async function fetchRaportBySiswa() {
       }).catch(err => err.response)
     ]);
 
-    // Proses data absensi
-    const semuaAbsensi = absensiResponse.data.data || [];
-    rekapAbsensiBulanIni.value = semuaAbsensi.filter(absen => absen.userId == siswaId);
 
-    // Proses data raport
-    if (raportResponse.status === 404) {
-      currentRaport.value = { id: null, siswaId, kelas: activeKelas.value, periode, nilai: [], catatanGuru: '' };
-    } else if (raportResponse.data?.data) {
-      const raport = raportResponse.data.data;
-      currentRaport.value = raport;
-      raportData.value = raport.nilai || [];
-      catatanGuru.value = raport.catatanGuru || '';
+    // Proses data absensi
+    if (absensiResponse?.data?.data) {
+        const semuaAbsensi = absensiResponse.data.data;
+        rekapAbsensiBulanIni.value = semuaAbsensi.filter(absen => absen.userId == siswaId);
     }
-    
-    if (templateResponse.data?.data) {
+
+    const raportFromApi = raportResponse?.data?.data;
+
+    if (raportFromApi && typeof raportFromApi === 'object' && raportFromApi.id) {
+      // Kasus 1: Sukses, data raport ditemukan di API
+      currentRaport.value = raportFromApi;
+      raportData.value = raportFromApi.nilai || [];
+      catatanGuru.value = raportFromApi.catatanGuru || '';
+    } else {
+      // Kasus 2: Gagal atau data tidak ada (404, 500, data null, dll.)
+      // Buat objek raport kosong agar UI tetap ditampilkan dengan benar.
+      currentRaport.value = {
+        id: null,
+        siswaId: siswaId,
+        kelas: activeKelas.value,
+        periode: periode,
+        nilai: [],
+        catatanGuru: ''
+      };
+      raportData.value = [];
+      catatanGuru.value = '';
+    }
+
+      if (templateResponse?.data?.data) {
       waliKelas.value = templateResponse.data.data.waliKelas || '';
     }
+
 
   } catch (error) {
     console.error('ERROR TERJADI DI DALAM FUNGSI:', error);
     showNotification('Terjadi kesalahan saat mengambil data.', 'error');
+     if (!currentRaport.value) {
+        currentRaport.value = { id: null, siswaId: selectedSiswaId.value, kelas: activeKelas.value, periode: `${selectedTahun.value}-${selectedSemester.value}`, nilai: [], catatanGuru: 'Gagal memuat data.' };
+     }
   } finally {
     raportLoading.value = false;
   }
@@ -1135,7 +1155,7 @@ async function tambahNilaiRaport() {
     newNilai.value.nilai = '';
     newNilai.value.keterangan = '';
 
-  
+  showNotification('Nilai berhasil disimpan', 'success')
   } catch (error) {
     console.error('Gagal menambah nilai raport:', error);
     showNotification('Gagal menyimpan data baru: ' + (error.response?.data?.message || error.message));
