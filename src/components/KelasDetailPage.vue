@@ -151,7 +151,7 @@
                   
                   <div v-for="user in userList" :key="user.id" class="grid-row">
                     <div class="row-cell name-cell">
-                      <img :src="`${apiBaseUrl}${user.profilePicture || '/default-avatar.png'}`" 
+                      <img :src="`${apiBaseUrl}${user.profilePicture || '/default-profile.png'}`" 
                             class="author-avatar"
                             @error="handleImageError">
                       {{ user.fullName }}
@@ -183,7 +183,7 @@
                 <div v-for="absen in absensiList" :key="absen.userId" class="attendance-item">
                   <div class="user-info">
                     <img
-                    :src="`${apiBaseUrl}${absen.profilePicture || '/default-avatar.png'}`" 
+                    :src="`${apiBaseUrl}${absen.profilePicture || '/default-profile.png'}`" 
                             class="author-avatar"
                             @error="handleImageError">
                     <span>{{ absen.fullName }}</span>
@@ -272,7 +272,7 @@
                         <div class="card-header">
                           <div class="author-info">
                             <img 
-                              :src="`${apiBaseUrl}${item.createdByUser.profilePicture || '/default-avatar.png'}`" 
+                              :src="`${apiBaseUrl}${item.createdByUser.profilePicture || '/default-profile.png'}`" 
                               class="author-avatar"
                               @error="handleImageError"
                             >
@@ -328,7 +328,7 @@
                               <div class="comment-header">
                                 <div class="comment-user">
                                   <img 
-                                    :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-avatar.png'}`" 
+                                    :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-profile.png'}`" 
                                     class="comment-avatar"
                                     @error="handleImageError"
                                   >
@@ -391,7 +391,7 @@
                       <div class="card-header">
                         <div class="author-info">
                           <img 
-                            :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-avatar.png'}`" 
+                            :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-profile.png'}`" 
                                     class="comment-avatar"
                                     @error="handleImageError"
                           >
@@ -834,8 +834,8 @@ function getAbsensiTooltip(userId, day) {
 
 function getUserAvatar(userId) {
   const user = userList.value.find(u => u.id === userId);
-  if (!user) return '/default-avatar.png';
-  return user?.profilePicture || '/default-avatar.png';
+  if (!user) return '/default-profile.png';
+  return user?.profilePicture || '/default-profile.png';
 }
 
 function prevMonth() {
@@ -1167,7 +1167,7 @@ function formatShortMonth(tanggal) {
 }
 
 function handleImageError(event) {
-  event.target.src = '/default-avatar.png';
+  event.target.src = '/default-profile.png';
 }
 
 async function loadAllClassData() {

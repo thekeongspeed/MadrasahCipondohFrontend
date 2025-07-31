@@ -9,7 +9,7 @@
             :src="serverUrl + user.profilePicture" 
             alt="Foto Profil" 
             class="profile-avatar"
-            @error="e => e.target.src = serverUrl + '/default-avatar.png'"
+            @error="e => e.target.src = serverUrl + '/default-profile.png'"
           >
           <div class="online-indicator" v-if="user.isOnline"></div>
         </div>

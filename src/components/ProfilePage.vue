@@ -206,7 +206,7 @@ const profileData = ref({
   dateOfBirth: '',
   parentName: '',
   address: '',
-  profilePicture: '/default-avatar.png',
+  profilePicture: '/default-profile.png',
   lastUpdated: null
 });
 const editableProfile = ref({});
@@ -244,7 +244,7 @@ const profileCompletion = computed(() => {
   const fields = ['fullName', 'email', 'phone', 'dateOfBirth', 'parentName', 'address', 'profilePicture'];
   const completedFields = fields.filter(field => {
     if (field === 'profilePicture') {
-      return profileData.value[field] && !profileData.value[field].includes('default-avatar');
+      return profileData.value[field] && !profileData.value[field].includes('default-profile');
     }
     return !!profileData.value[field];
   });
@@ -275,7 +275,7 @@ const notificationClass = computed(() => {
 
 // Methods
 function handleImageError(e) {
-  e.target.src = serverUrl + '/default-avatar.png';
+  e.target.src = serverUrl + '/default-profile.png';
 }
 
 function handleFileChange(event) {
