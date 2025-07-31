@@ -1227,7 +1227,8 @@ const fetchMateriForKelas = async (kelas) => {
     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/template/${kelas}`, {
       headers: { 'Authorization': `Bearer ${token.value}` }
     });
-    materiList.value = response.data;
+    const templateData = response.data.data;
+    materiList.value = templateData ? templateData.kolom : [];
   } catch (error) {
     console.error(`Gagal memuat materi untuk kelas ${kelas}:`, error);
     materiList.value = [];
