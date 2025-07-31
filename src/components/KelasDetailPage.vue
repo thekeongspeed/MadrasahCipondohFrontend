@@ -868,23 +868,45 @@ const editingPengumumanId = ref(null);
 const editablePengumuman = ref({ judul: '', isi: '' });
 const showEmojiPicker = ref({});
 
+
+
+
 async function fetchPengumuman() {
   pengumumanLoading.value = true;
   try {
     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman/${namaKelas.value}`, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
-    pengumumanList.value = response.data;
-    // Initialize showComments for each pengumuman
+
+    const dataYangValid = response.data.filter(item => {
+     
+      if (item && item.createdByUser) {
+        return true;
+      } else {
+       
+        console.warn('Data pengumuman tidak lengkap dan akan dilewati:', item);
+        return false;
+      }
+    });
+
+  
+    pengumumanList.value = dataYangValid;
+   
     pengumumanList.value.forEach(item => {
       showComments.value[item.id] = false;
     });
+
   } catch (error) { 
     console.error("Gagal mengambil pengumuman:", error);
+    pengumumanList.value = []; 
   } finally { 
     pengumumanLoading.value = false;
   }
 }
+
+
+
+
 
 async function addKomentar(pengumumanId) {
   const isiKomentar = (newKomentar.value[pengumumanId] || '').trim();
@@ -904,6 +926,8 @@ async function addKomentar(pengumumanId) {
   }
 }
 
+
+
 async function addPengumuman() {
   try {
     await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman`, newPengumuman.value, {
@@ -919,6 +943,8 @@ async function addPengumuman() {
   }
 }
 
+
+
 async function deletePengumuman(pengumumanId) {
   if (!confirm('Anda yakin ingin menghapus pengumuman ini?')) return;
   try {
@@ -932,6 +958,8 @@ async function deletePengumuman(pengumumanId) {
   }
 }
 
+
+
 async function saveEdit(pengumumanId) {
   try {
     await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/pengumuman/${pengumumanId}`, editablePengumuman.value, { 
@@ -944,6 +972,8 @@ async function saveEdit(pengumumanId) {
     // Show error to user
   }
 }
+
+
 
 function enterEditMode(pengumuman) {
   editingPengumumanId.value = pengumuman.id;
