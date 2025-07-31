@@ -151,7 +151,7 @@
                   
                   <div v-for="user in userList" :key="user.id" class="grid-row">
                     <div class="row-cell name-cell">
-                      <img :src="`${apiBaseUrl}${item.createdByUser?.profilePicture || '/default-avatar.png'}`" 
+                      <img :src="`${apiBaseUrl}${user.profilePicture || '/default-avatar.png'}`" 
                             class="author-avatar"
                             @error="handleImageError">
                       {{ user.fullName }}
@@ -183,7 +183,7 @@
                 <div v-for="absen in absensiList" :key="absen.userId" class="attendance-item">
                   <div class="user-info">
                     <img
-                    :src="`${apiBaseUrl}${item.createdByUser?.profilePicture || '/default-avatar.png'}`" 
+                    :src="`${apiBaseUrl}${absen.profilePicture || '/default-avatar.png'}`" 
                             class="author-avatar"
                             @error="handleImageError">
                     <span>{{ absen.fullName }}</span>
