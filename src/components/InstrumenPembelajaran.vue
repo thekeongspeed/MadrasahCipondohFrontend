@@ -1075,7 +1075,7 @@ async function fetchRaportBySiswa() {
 
       axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/template/public/${activeKelas.value}`, {
         headers: { 'Authorization': `Bearer ${token}` }
-      })
+      }).catch(err => err.response)
     ]);
 
     // Proses data absensi
