@@ -146,11 +146,16 @@
         </div>
         
         <div class="student-photo-placeholder">
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+           <img 
+            v-if="selectedSiswaInfo?.profilePicture" 
+            :src="getProfilePictureUrl(selectedSiswaInfo.profilePicture)" 
+            :alt="selectedSiswaInfo.fullName"
+            class="student-photo">
+          <svg v-else width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="#4A90E2" stroke-width="2"/>
             <path d="M20.59 22C20.59 18.13 16.74 15 12 15C7.26003 15 3.41003 18.13 3.41003 22" stroke="#4A90E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-        </div>
+                </div>
       </div>
 
       <div class="student-info-grid">
@@ -866,6 +871,16 @@ const deleteFile = async (id) => {
   }
 };
 
+
+
+const getProfilePictureUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${import.meta.env.VITE_API_BASE_URL}${path}`;
+};
+
+
+
 function cetakRaport(dataSiswa, dataNilai, catatan, dataAbsensi) {
   const doc = new jsPDF();
 
@@ -1034,7 +1049,7 @@ async function fetchSiswaByKelas(kelas) {
     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users/kelas/${kelas}`, { 
       headers: { 'Authorization': `Bearer ${token.value}` }
     });
-    raportSiswaList.value = response.data.map(user => ({ ...user, id: user.id }));
+    raportSiswaList.value = response.data.map(user => ({ ...user, id: user.id, profilePicture: user.profilePicture || '' }));
   } catch (error) {
     console.error('Gagal mengambil daftar siswa:', error);
     raportSiswaList.value = [];
@@ -2202,6 +2217,14 @@ watchEffect(() => {
   margin: 0.2rem 0;
   font-size: 0.9rem;
   color: #7f8c8d;
+}
+
+.student-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4A90E2;
 }
 
 .student-photo-placeholder {

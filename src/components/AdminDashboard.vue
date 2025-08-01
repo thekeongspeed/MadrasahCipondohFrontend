@@ -206,7 +206,15 @@
         
         <div class="modal-header">
           <div class="modal-avatar">
-            <span class="avatar-initial-large">{{ getInitials(selectedUser.fullName) }}</span>
+            <span class="avatar-initial-large">
+              <img 
+                v-if="selectedUser.profilePicture && selectedUser.profilePicture !== '/default-profile.png'" 
+                :src="getProfilePictureUrl(selectedUser.profilePicture)" 
+                :alt="selectedUser.fullName">
+              <span v-else>
+                {{ getInitials(selectedUser.fullName) }}
+              </span>
+            </span>
           </div>
           <div class="modal-user-info">
             <h2>{{ selectedUser.fullName || '-' }}</h2>
@@ -948,12 +956,13 @@ onMounted(fetchUsers);
 .user-avatar img {
  width: 100%;
  height: 100%;
- object-fit: cover; /* Memastikan gambar mengisi seluruh area tanpa distorsi */
+ object-fit: cover; 
+ border-radius: 50%;
 }
 
 .avatar-initial {
-  line-height: 1;
-   width: 100%;
+ line-height: 1;
+ width: 100%;
  height: 100%;
  display: flex;
  justify-content: center;
@@ -1404,6 +1413,26 @@ onMounted(fetchUsers);
 }
 
 
+
+
+
+.avatar-initial-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+    border-radius: 50%;
+  overflow: hidden;
+  display: inline-block;
+}
+
+
+.avatar-initial-large img {
+  width: 100%; 
+  height: 100%;
+  object-fit: cover; 
+}
 
 
 
