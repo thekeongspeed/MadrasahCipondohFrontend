@@ -514,7 +514,7 @@ async function deleteUser(event, user) {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     alert('Pengguna berhasil dihapus.');
-    fetchUsers(); // Refresh data di tabel
+    fetchUsers();
   } catch (err) {
     alert('Gagal menghapus pengguna.');
     console.error('Delete user error:', err);

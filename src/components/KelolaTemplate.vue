@@ -18,7 +18,7 @@
       <div class="card kelas-selector">
         <label for="kelas-select">Pilih Kelas</label>
         <div class="select-wrapper">
-          <select id="kelas-select" v-model="selectedKelas" @change="fetchKolom">
+          <select id="kelas-select" v-model="selectedKelas" @change="fetchTemplateData">
             <option value="paud">Paud</option>
             <option value="caberawit">Caberawit</option>
             <option value="pra-remaja">Pra Remaja</option>
@@ -77,7 +77,7 @@
         <div class="list-header">
           <h3>Daftar Materi untuk Kelas: <span class="kelas-name">{{ formatKelasName(selectedKelas) }}</span></h3>
           <div class="list-actions">
-            <button @click="fetchKolom" class="btn-refresh" :class="{ refreshing: loading }">
+            <button @click="fetchTemplateData" class="btn-refresh" :class="{ refreshing: loading }">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C15.0396 2 17.7895 3.27675 19.7942 5.3125M19.7942 5.3125V2M19.7942 5.3125H16.9811" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -128,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, inject } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
@@ -143,6 +143,7 @@ const router = useRouter();
 const waliKelas = ref(''); 
 const activeKelas = ref('paud');
 const savingWaliKelas = ref(false);
+const showNotification = inject('showNotification');
 
 
 
@@ -164,7 +165,12 @@ const fetchKolom = async () => {
     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/template/${selectedKelas.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    kolomList.value = response.data;
+
+    const template = response.data.data || {};
+    kolomList.value = template.kolom || [];
+    waliKelas.value = template.waliKelas || '';
+
+
   } catch (error) {
     console.error('Gagal mengambil data materi:', error);
     showToast('Gagal memuat data materi', 'error');
@@ -189,10 +195,10 @@ const addKolom = async () => {
     kolomList.value.push(response.data); // Asumsi respons langsung mengembalikan objek kolom baru
     
     newKolom.value.nama = '';
-    showToast('Materi berhasil ditambahkan', 'success');
+    showNotification('Materi berhasil ditambahkan', 'success');
   } catch (error) {
     console.error('Gagal menambah materi:', error);
-    showToast('Gagal menambah materi: ' + (error.response?.data?.message || error.message), 'error');
+    showNotification('Gagal menambah materi: ' + (error.response?.data?.message || error.message), 'error');
   } finally {
     adding.value = false;
   }
@@ -209,10 +215,10 @@ const deleteKolom = async (kolomId) => {
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
     kolomList.value = kolomList.value.filter(k => k.id !== kolomId);
-    showToast('Materi berhasil dihapus', 'success');
+    showNotification('Materi berhasil dihapus', 'success');
   } catch (error) {
     console.error('Gagal menghapus materi:', error);
-    showToast('Gagal menghapus materi', 'error');
+    showNotification('Gagal menghapus materi', 'error');
   } finally {
     deleting.value = null;
   }
@@ -258,10 +264,10 @@ async function saveWaliKelas() {
       { waliKelas: waliKelas.value },
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
-    showToast('Nama wali kelas berhasil disimpan', 'success');
+    showNotification('Nama wali kelas berhasil disimpan', 'success');
   } catch (error) {
     console.error('Gagal menyimpan wali kelas:', error);
-    showToast('Gagal menyimpan nama wali kelas', 'error');
+    showNotification('Gagal menyimpan nama wali kelas', 'error');
   } finally {
     savingWaliKelas.value = false;
   }

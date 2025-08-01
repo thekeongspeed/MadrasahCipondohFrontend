@@ -104,21 +104,21 @@ const jajaranPengurus = ref([
   {
     nama: 'Sujimin',
     jabatan: 'Dewan Pembina',
-    fotoUrl: '/foto-profil-yusuf.png',
+    fotoUrl: '/default-profile.png',
     kontak: '+62 825-8971-1330',
     kategori: 'pembina'
   },
   {
     nama: 'Mutoyo',
     jabatan: 'Wakil Pembina',
-    fotoUrl: '/foto-profil-fauzi.png',
+    fotoUrl: '/default-profile.png',
     kontak: '+62 822-3445-2489',
     kategori: 'pembina'
   },
   {
     nama: 'Syamsudin',
     jabatan: 'Wakil Pembina',
-    fotoUrl: '/foto-profil-aminah.png',
+    fotoUrl: '/default-profile.png',
     kontak: '+62 812-9609-4965',
     kategori: 'pembina'
   },
@@ -146,28 +146,28 @@ const jajaranPengurus = ref([
   {
     nama: 'Yasser',
     jabatan: 'Pakar Pendidik (Putra)',
-    fotoUrl: '/foto-profil-aminah.png',
+    fotoUrl: '/default-profile.png',
     kontak: '+62 852-8201-1118',
     kategori: 'pendidik'
   },
   {
     nama: 'Retno Handayani',
     jabatan: 'Pakar Pendidik (Putri)',
-    fotoUrl: '/foto-profil-ghani.png',
+    fotoUrl: '/default-profile.png',
     kontak: '+62 857-7926-8211',
     kategori: 'pendidik'
   },
   {
     nama: 'Ririn Ambarwati',
     jabatan: 'Wali Orang Tua (Usia PAUD-Caberawit)',
-    fotoUrl: '/foto-profil-yusuf.png',
+    fotoUrl: '/default-profile.png',
     kontak: '+62 821-1492-3858',
     kategori: 'wali'
   },
   {
     nama: 'Nurul Nafisah',
     jabatan: 'Wali Orang Tua (Usia SMP-SMA)',
-    fotoUrl: '/foto-profil-fauzi.png',
+    fotoUrl: '/default-profile.png',
     kontak: '+62 856-4963-3335',
     kategori: 'wali'
   },

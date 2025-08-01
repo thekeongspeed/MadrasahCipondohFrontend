@@ -408,10 +408,8 @@ function formatSimpleDate(tanggal) {
 
 function handleLogout() {
   if (confirm('Anda yakin ingin keluar?')) {
-    // Hapus semua data dari localStorage
+   
     localStorage.clear();
-    
-    // Arahkan ke halaman login dan paksa reload
     window.location.href = '/login';
   }
 }
