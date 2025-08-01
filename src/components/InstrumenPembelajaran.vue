@@ -421,12 +421,14 @@
         </div>
       </form>
                         
-                        
-      <div v-else class="empty-list-message">
-        <p>Silakan pilih siswa, tahun ajaran, dan semester, lalu klik "Tampilkan Raport".</p>
-      </div>
     </div>
   </div>
+      <div v-else class="empty-list-message">
+        <p v-if="showAdminPrompt">Silakan pilih siswa, tahun ajaran, dan semester, lalu klik "Tampilkan Raport"</p>
+        <p v-else-if="showNoDataMessage">Belum ada data raport untuk semester ini.</p>
+      </div>
+      
+  
     </div>
   </template>
   
@@ -1065,24 +1067,22 @@ async function fetchRaportBySiswa() {
   if (!siswaId) return;
 
   raportLoading.value = true;
-  // Reset state
+  // Reset semua state yang relevan ke kondisi awal
   currentRaport.value = null;
   raportData.value = [];
   catatanGuru.value = '';
   rekapAbsensiBulanIni.value = [];
   waliKelas.value = '';
   
-
   try {
     const token = localStorage.getItem('token');
     const tahun = selectedTahun.value;
     const semester = selectedSemester.value;
     const periode = `${tahun}-${semester}`;
-    const startDate = semester === 1 ? `${tahun}-07-01` : `${tahun}-01-01`;
-    const endDate = semester === 1 ? `${tahun}-12-31` : `${tahun}-06-30`;
+    const startDate = semester == 1 ? `${tahun}-07-01` : `${tahun + 1}-01-01`;
+    const endDate = semester == 1 ? `${tahun}-12-31` : `${tahun + 1}-06-30`;
 
-    // PERBAIKAN: Hapus panggilan ke /api/template dari Promise.all
-    const [absensiResponse, raportResponse, templateResponse, siswaResponse] = await Promise.all([
+    const [absensiResponse, raportResponse, templateResponse] = await Promise.all([
       axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/absensi/rekap/rentang`, {
         params: { kelas: activeKelas.value, startDate, endDate },
         headers: { 'Authorization': `Bearer ${token}` }
@@ -1090,65 +1090,39 @@ async function fetchRaportBySiswa() {
       axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/raport/${siswaId}/${activeKelas.value}/${periode}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       }).catch(err => err.response),
-
       axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/template/public/${activeKelas.value}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       }).catch(err => err.response)
     ]);
 
-
-    if (siswaResponse?.data) {
-       if (isAdmin.value) {
-        selectedSiswaInfo.value = {
-          ...selectedSiswaInfo.value,
-          profilePicture: siswaResponse.data.profilePicture
-        };
-      }
-      else {
-        localStorage.setItem('userProfilePicture', siswaResponse.data.profilePicture || '');
-      }
-    }
-
-
     // Proses data absensi
     if (absensiResponse?.data?.data) {
-        const semuaAbsensi = absensiResponse.data.data;
-        rekapAbsensiBulanIni.value = semuaAbsensi.filter(absen => absen.userId == siswaId);
+      const semuaAbsensi = absensiResponse.data.data;
+      rekapAbsensiBulanIni.value = semuaAbsensi.filter(absen => absen.userId == siswaId);
     }
+
 
     const raportFromApi = raportResponse?.data?.data;
 
+   
     if (raportFromApi && typeof raportFromApi === 'object' && raportFromApi.id) {
-      // Kasus 1: Sukses, data raport ditemukan di API
       currentRaport.value = raportFromApi;
       raportData.value = raportFromApi.nilai || [];
       catatanGuru.value = raportFromApi.catatanGuru || '';
     } else {
-      // Kasus 2: Gagal atau data tidak ada (404, 500, data null, dll.)
-      // Buat objek raport kosong agar UI tetap ditampilkan dengan benar.
-      currentRaport.value = {
-        id: null,
-        siswaId: siswaId,
-        kelas: activeKelas.value,
-        periode: periode,
-        nilai: [],
-        catatanGuru: ''
-      };
-      raportData.value = [];
-      catatanGuru.value = '';
+
+      currentRaport.value = null; 
     }
 
-      if (templateResponse?.data?.data) {
+    if (templateResponse?.data?.data) {
       waliKelas.value = templateResponse.data.data.waliKelas || '';
     }
 
-
   } catch (error) {
-    console.error('ERROR TERJADI DI DALAM FUNGSI:', error);
+    console.error('Terjadi kesalahan saat mengambil data raport:', error);
     showNotification('Terjadi kesalahan saat mengambil data.', 'error');
-     if (!currentRaport.value) {
-        currentRaport.value = { id: null, siswaId: selectedSiswaId.value, kelas: activeKelas.value, periode: `${selectedTahun.value}-${selectedSemester.value}`, nilai: [], catatanGuru: 'Gagal memuat data.' };
-     }
+  
+    currentRaport.value = null;
   } finally {
     raportLoading.value = false;
   }
@@ -1431,6 +1405,15 @@ const renderChart = () => {
 };
 
 
+const showAdminPrompt = computed(() => {
+  return isAdmin.value && !selectedSiswaId.value && !raportLoading.value;
+});
+
+const showNoDataMessage = computed(() => {
+  return !raportData.value.length && !raportLoading.value;
+});
+
+
 // Lifecycle hooks
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
@@ -1449,6 +1432,14 @@ onMounted(() => {
     // Jika user biasa, atur tab aktif sesuai kelasnya dari localStorage
     activeKelas.value = userKelas.value;
   }
+
+  if (!isAdmin.value) {
+    // Auto-set siswaId untuk user biasa
+    selectedSiswaId.value = userId.value;
+    // Langsung fetch data
+    fetchRaportBySiswa();
+  }
+  
 });
 
 onUnmounted(() => {
