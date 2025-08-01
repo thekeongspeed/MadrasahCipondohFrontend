@@ -147,9 +147,9 @@
         
         <div class="student-photo-placeholder">
            <img 
-            v-if="selectedSiswaInfo?.profilePicture" 
-            :src="getProfilePictureUrl(selectedSiswaInfo.profilePicture)" 
-            :alt="selectedSiswaInfo.fullName"
+             v-if="(isAdmin ? selectedSiswaInfo?.profilePicture : userProfilePicture)"
+            :src="getProfilePictureUrl(isAdmin ? selectedSiswaInfo?.profilePicture : userProfilePicture)" 
+            :alt="isAdmin ? selectedSiswaInfo?.fullName : userFullName"
             class="student-photo">
           <svg v-else width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="#4A90E2" stroke-width="2"/>
@@ -581,7 +581,7 @@ const rekapAbsensiBulanIni = ref([]);
 const waliKelas = ref('');
 const userParentName = ref(localStorage.getItem('userParentName'));
 const showNotification = inject('showNotification');
-
+const userProfilePicture = ref(localStorage.getItem('userProfilePicture') || '');
 
 
 
@@ -874,11 +874,13 @@ const deleteFile = async (id) => {
 
 
 const getProfilePictureUrl = (path) => {
-  if (!path) return '';
+  if (!path || path === '/default-profile.png') return '';
   if (path.startsWith('http')) return path;
-  return `${import.meta.env.VITE_API_BASE_URL}${path}`;
+  if (path.startsWith('/')) {
+    return `${import.meta.env.VITE_API_BASE_URL}${path}`;
+  }
+  return `${import.meta.env.VITE_API_BASE_URL}/${path}`;
 };
-
 
 
 function cetakRaport(dataSiswa, dataNilai, catatan, dataAbsensi) {
@@ -1080,7 +1082,7 @@ async function fetchRaportBySiswa() {
     const endDate = semester === 1 ? `${tahun}-12-31` : `${tahun}-06-30`;
 
     // PERBAIKAN: Hapus panggilan ke /api/template dari Promise.all
-    const [absensiResponse, raportResponse, templateResponse] = await Promise.all([
+    const [absensiResponse, raportResponse, templateResponse, siswaResponse] = await Promise.all([
       axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/absensi/rekap/rentang`, {
         params: { kelas: activeKelas.value, startDate, endDate },
         headers: { 'Authorization': `Bearer ${token}` }
@@ -1093,6 +1095,19 @@ async function fetchRaportBySiswa() {
         headers: { 'Authorization': `Bearer ${token}` }
       }).catch(err => err.response)
     ]);
+
+
+    if (siswaResponse?.data) {
+       if (isAdmin.value) {
+        selectedSiswaInfo.value = {
+          ...selectedSiswaInfo.value,
+          profilePicture: siswaResponse.data.profilePicture
+        };
+      }
+      else {
+        localStorage.setItem('userProfilePicture', siswaResponse.data.profilePicture || '');
+      }
+    }
 
 
     // Proses data absensi
