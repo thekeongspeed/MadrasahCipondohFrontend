@@ -2294,6 +2294,7 @@ watchEffect(() => {
   color: var(--text-light);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
+  margin-right: 8px;
 }
 
 .user-info span {
