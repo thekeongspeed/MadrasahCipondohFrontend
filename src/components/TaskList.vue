@@ -17,7 +17,7 @@
         <transition name="fade-down" appear>
           <div>
             <h1>Selamat Datang di <span class="highlight">Madrasah Cipondoh</span></h1>
-            <p class="subtitle">Mencetak Generasi Penerus dengan 29 Karakter dalam Jama'ah</p>
+            <p class="subtitle">Mencetak Generasi Penerus dengan 29 Karakter Luhur dalam Jama'ah</p>
           </div>
         </transition>
         
@@ -250,7 +250,7 @@ const unhoverCard = (index) => {
 // Stats data
 const stats = ref([
   { id: 1, value: '5', label: 'Kelas' },
-  { id: 2, value: '40+', label: 'Siswa' },
+  { id: 2, value: '30+', label: 'Siswa' },
   { id: 3, value: '3', label: 'Pengajar' },
   { id: 4, value: '5+', label: 'Program' }
 ]);
@@ -352,7 +352,7 @@ onMounted(() => {
   background: linear-gradient(135deg, #014283, #0277bd);
   color: #ffffff;
   position: relative;
-  overflow: hidden;
+  overflow: center;
   clip-path: ellipse(100% 100% at 50% 0%);
 }
 
@@ -361,6 +361,7 @@ onMounted(() => {
   z-index: 3;
   max-width: 900px;
   margin: 0 auto;
+  padding-top: 70px;
 }
 
 .page-header h1 {

@@ -6,7 +6,7 @@
       <transition name="bounce" appear>
         <div class="logo-container">
           <img src="/logo-madrasah.png" alt="Logo Madrasah" class="login-logo" />
-          <h1 class="institution-name">Madrasah Digital</h1>
+          <h1 class="institution-name">Madrasah Cipondoh</h1>
         </div>
       </transition>
       
@@ -448,6 +448,7 @@ async function handleRegister() {
   transition: background 1s ease;
   position: relative;
   overflow: hidden;
+  padding-top: 70px;
 }
 
 .auth-overlay {
@@ -525,6 +526,9 @@ h2 {
 .profile-picture-edit {
   text-align: center;
   margin-bottom: 2rem;
+   display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .profile-picture-wrapper {

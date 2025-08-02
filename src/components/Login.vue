@@ -175,6 +175,7 @@ async function handleLogin() {
   transition: background 1s ease;
   position: relative;
   overflow: hidden;
+  padding-top: 70px;
 }
 
 .auth-overlay {

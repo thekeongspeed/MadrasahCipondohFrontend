@@ -233,6 +233,7 @@ const formatPhoneNumber = (phone) => {
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
   position: relative;
+  padding-top: 70px;
 }
 
 /* Floating Elements Animation */

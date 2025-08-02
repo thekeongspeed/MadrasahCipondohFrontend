@@ -1535,6 +1535,7 @@ watchEffect(() => {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  padding-top: 70px;
 }
 
 /* Floating Elements Animation */

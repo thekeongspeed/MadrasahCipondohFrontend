@@ -294,6 +294,7 @@ onMounted(fetchTemplateData);
   margin-bottom: 3rem;
   position: relative;
   padding-bottom: 1rem;
+  padding-top: 70px;
 }
 
 .header-content {

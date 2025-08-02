@@ -459,6 +459,7 @@ watch(profileData, (newVal) => {
   margin-bottom: 2.5rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid #eaeaea;
+  padding-top: 70px;
 }
 
 .profile-title {

@@ -154,7 +154,7 @@
                       <img :src="`${apiBaseUrl}${user.profilePicture || '/default-profile.png'}`" 
                             class="author-avatar"
                             @error="handleImageError">
-                      {{ user.fullName }}
+                     <span> {{ user.fullName }} </span>
                     </div>
                     <div 
                       v-for="day in totalHari" 
@@ -1220,6 +1220,7 @@ onMounted(() => {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   overflow: hidden;
+  padding-top: 70px;
 }
 
 /* Header Styles */
@@ -1802,6 +1803,11 @@ onMounted(() => {
   border: 2px solid #ddd;
 }
 
+.author-avatar, 
+.comment-avatar {
+  margin-right: 10px; 
+}
+
 .announcement-title {
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
@@ -1916,7 +1922,7 @@ onMounted(() => {
 .comment-user {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 10rem;
 }
 
 .comment-avatar {

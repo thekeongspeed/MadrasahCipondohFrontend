@@ -582,6 +582,7 @@ onMounted(fetchUsers);
   gap: 1.5rem;
   position: relative;
   z-index: 2;
+  padding-top: 70px;
 }
 
 

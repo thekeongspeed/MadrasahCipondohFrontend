@@ -145,6 +145,7 @@ onMounted(() => {
   box-shadow: 0 8px 30px rgba(0,0,0,0.1);
   overflow: hidden;
   transition: all 0.3s ease;
+  padding-top: 70px;
 }
 
 .profile-card.is-teacher .profile-background,
