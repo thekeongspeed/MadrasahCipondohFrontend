@@ -368,6 +368,14 @@
         </div>
       </div>
 
+ </div>
+  </div>
+      
+      <div v-else class="empty-list-message">
+        <p v-if="showAdminPrompt">Silakan pilih siswa, tahun ajaran, dan semester, lalu klik "Tampilkan Raport"</p>
+        <p v-else-if="showNoDataMessage">Belum ada data raport untuk semester ini.</p>
+      </div>
+
       <div class="catatan-guru-section" v-if="isAdmin">
         <h4>Catatan Guru</h4>
         <textarea v-model="catatanGuru" placeholder="Tuliskan catatan atau feedback umum untuk siswa..."></textarea>
@@ -420,16 +428,9 @@
           <button type="submit" class="submit-btn">Tambah Nilai</button>
         </div>
       </form>
-                        
-    </div>
-  </div>
-      <div v-else class="empty-list-message">
-        <p v-if="showAdminPrompt">Silakan pilih siswa, tahun ajaran, dan semester, lalu klik "Tampilkan Raport"</p>
-        <p v-else-if="showNoDataMessage">Belum ada data raport untuk semester ini.</p>
-      </div>
-      
-  
-    </div>
+     
+   
+     </div>
   </template>
   
 

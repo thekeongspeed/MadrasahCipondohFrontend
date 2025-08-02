@@ -127,14 +127,14 @@ const jajaranPengurus = ref([
     jabatan: 'Penanggungjawab Program Tingkat Kelompok',
     fotoUrl: '/foto-profil-dani.png',
     kontak: '+62 853-2163-1281',
-    kategori: 'manajemen'
+    kategori: ['manajemen', 'pengajar']
   },
   {
     nama: 'Lulia Nurul Khoiri',
     jabatan: 'Bendahara',
     fotoUrl: '/foto-profil-lulia.png',
     kontak: '+62 822-8119-6934',
-    kategori: 'manajemen'
+    kategori: ['manajemen','pengajar']
   },
   {
     nama: 'Lurian Nurnuha',
@@ -151,7 +151,7 @@ const jajaranPengurus = ref([
     kategori: 'pendidik'
   },
   {
-    nama: 'Retno Handayani',
+    nama: 'Retno Nur Handayani',
     jabatan: 'Pakar Pendidik (Putri)',
     fotoUrl: '/default-profile.png',
     kontak: '+62 857-7926-8211',
@@ -165,7 +165,7 @@ const jajaranPengurus = ref([
     kategori: 'wali'
   },
   {
-    nama: 'Nurul Nafisah',
+    nama: 'Nurul Farisa',
     jabatan: 'Wali Orang Tua (Usia SMP-SMA)',
     fotoUrl: '/default-profile.png',
     kontak: '+62 856-4963-3335',
@@ -176,7 +176,7 @@ const jajaranPengurus = ref([
     jabatan: 'Koordinator Guru',
     fotoUrl: '/foto-profil-diyan.png',
     kontak: '+62 858-8940-9822',
-    kategori: 'pendidik'
+    kategori: ['pendidik', 'pengajar']
   },
 ]);
 
@@ -185,7 +185,8 @@ const filters = [
   { label: 'Pembina', value: 'pembina' },
   { label: 'Manajemen', value: 'manajemen' },
   { label: 'Pendidik', value: 'pendidik' },
-  { label: 'Wali', value: 'wali' }
+  { label: 'Wali', value: 'wali' },
+  { label: 'Pengajar', value: 'pengajar' }
 ];
 
 const activeFilter = ref('semua');
@@ -207,7 +208,11 @@ const floatingElementStyle = (i) => {
 
 const filteredPengurus = computed(() => {
   if (activeFilter.value === 'semua') return jajaranPengurus.value;
-  return jajaranPengurus.value.filter(p => p.kategori === activeFilter.value);
+  return jajaranPengurus.value.filter(p => 
+    Array.isArray(p.kategori) 
+      ? p.kategori.includes(activeFilter.value)
+      : p.kategori === activeFilter.value
+  );
 });
 
 const hoverMember = (nama) => {
