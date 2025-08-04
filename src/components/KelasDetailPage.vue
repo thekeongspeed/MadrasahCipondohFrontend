@@ -590,7 +590,7 @@ const dataInfoKelas = {
   paud: {
     nama: 'PAUD',
     deskripsi: 'Belajar sambil bermain untuk fondasi 29 Karakter Luhur Jama\'ah ',
-    fotoUrl: '/foto-paud.png',
+    fotoUrl: '/foto-paud.jpg',
     rentangUsia: { min: 4, max: 6  },
     tahun: 'Tahun',
     icon: 'fas fa-child'
@@ -598,7 +598,7 @@ const dataInfoKelas = {
   caberawit: {
     nama: 'Caberawit',
     deskripsi: 'Membaca, menghafal, dan memahami dasar-dasar 29 Karakter Luhur Jama\'ah',
-    fotoUrl: '/foto-caberawit.png',
+    fotoUrl: '/foto-caberawit.jpg',
     rentangUsia: { min: 7, max: 12 },
     tahun: 'Tahun',
     icon: 'fas fa-quran'
@@ -606,7 +606,7 @@ const dataInfoKelas = {
   'pra-remaja': {
     nama: 'Pra Remaja',
     deskripsi: 'Mengkaji Al-Qur\'an & Al-Hadits untuk membentuk 29 Karakter Luhur Jama\'ah',
-    fotoUrl: '/foto-pra-remaja.png',
+    fotoUrl: '/foto-pra-remaja.jpg',
     rentangUsia: { min: 13, max: 15 },
     tahun: 'Tahun',
     icon: 'fas fa-mosque'
@@ -614,7 +614,7 @@ const dataInfoKelas = {
   remaja: {
     nama: 'Remaja',
     deskripsi: 'Mengkaji Al-Qur\'an & Al-Hadits untuk menerapkan 29 Karakter Luhur Jama\'ah',
-    fotoUrl: '/foto-remaja.png',
+    fotoUrl: '/foto-remaja.jpg',
     rentangUsia: { min: 16, max: 18 },
     tahun: 'Tahun',
     icon: 'fas fa-users'
