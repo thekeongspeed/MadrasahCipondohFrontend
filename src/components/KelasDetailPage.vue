@@ -129,6 +129,16 @@
 
             <div v-if="!isAdmin" class="self-attendance-section">
           <h4><i class="fas fa-hand-pointer"></i> Absen Hari Ini</h4>
+
+               <div class="date-picker-user">
+                  <label for="self-attendance-date">Pilih Tanggal Absen:</label>
+                  <input 
+                    type="date" 
+                    id="self-attendance-date"
+                    v-model="selfAttendanceDate"
+                  >
+                </div>
+
           <div v-if="isCheckingAttendance" class="loading-spinner small">
             <i class="fas fa-spinner fa-spin"></i> Memeriksa status...
           </div>
@@ -162,7 +172,33 @@
             </div>
           </div>
         </div>
-             
+
+             <transition name="fade">
+                <div v-if="showAttendanceModal" class="modal-overlay" @click.self="closeAttendanceModal">
+                  <div class="modal-content">
+                    <button @click="closeAttendanceModal" class="close-button">&times;</button>
+                    <h3>Form Keterangan {{ selectedStatus }}</h3>
+                    <p>Silakan isi alasan Anda tidak dapat hadir.</p>
+                    <form @submit.prevent="markSelfAttendance(selectedStatus, attendanceReason)">
+                      <div class="form-group">
+                        <label for="keterangan">Keterangan</label>
+                        <textarea 
+                          id="keterangan"
+                          v-model="attendanceReason"
+                          rows="4"
+                          placeholder="Contoh: Kurang enak badan"
+                          required
+                        ></textarea>
+                      </div>
+                      <button type="submit" class="styled-button primary" :disabled="isSubmittingAttendance">
+                        <i v-if="isSubmittingAttendance" class="fas fa-spinner fa-spin"></i>
+                        <span v-else>Kirim</span>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </transition>
+
             
             <div v-if="absensiView === 'daftar' || !isAdmin">
               <div class="month-selector">
@@ -630,6 +666,7 @@ const showAttendanceModal = ref(false);
 const selectedStatus = ref('');
 const attendanceReason = ref('');
 const isSubmittingAttendance = ref(false);
+const selfAttendanceDate = ref(new Date().toISOString().slice(0, 10));
 
 
 // Enhanced class information
@@ -848,21 +885,6 @@ async function saveAbsensi() {
   }
 }
 
-function getStatusClass(userId, day) {
-  const status = getAbsensiStatus(userId, day);
-  return status ? status.toLowerCase() : '';
-}
-
-function getStatusIcon(userId, day) {
-  const status = getAbsensiStatus(userId, day);
-  switch(status) {
-    case 'Hadir': return 'fas fa-check text-success';
-    case 'Izin': return 'fas fa-envelope text-warning';
-    case 'Sakit': return 'fas fa-procedures text-info';
-    case 'Alpa': return 'fas fa-times text-danger';
-    default: return 'fas fa-minus text-muted';
-  }
-}
 
 function getAbsensiStatus(userId, day) {
   const [year, month] = selectedMonth.value.split('-').map(Number);
@@ -878,8 +900,47 @@ function getAbsensiStatus(userId, day) {
 }
 
 function getAbsensiTooltip(userId, day) {
-  const status = getAbsensiStatus(userId, day);
-  return status ? `${status} - ${day} ${formatBulan(selectedMonth.value)}` : '';
+    const record = getAbsensiRecord(userId, day);
+    if (!record) return '';
+
+    let tooltipText = `${record.status} - ${day} ${formatBulan(selectedMonth.value)}`;
+    
+    // Tambahkan keterangan jika statusnya Izin atau Sakit dan keterangan ada
+    if ((record.status === 'Izin' || record.status === 'Sakit') && record.keterangan) {
+        tooltipText += `\nKeterangan: ${record.keterangan}`;
+    }
+    return tooltipText;
+}
+
+
+function getAbsensiRecord(userId, day) {
+    const [year, month] = selectedMonth.value.split('-').map(Number);
+    return absensiData.value.find(absen => {
+        if (!absen.userId) return false;
+        const absenDate = new Date(absen.tanggal);
+        return absen.userId === userId &&
+               absenDate.getUTCFullYear() === year &&
+               absenDate.getUTCMonth() + 1 === month &&
+               absenDate.getUTCDate() === day;
+    }) || null;
+}
+
+function getStatusClass(userId, day) {
+  const record = getAbsensiRecord(userId, day);
+  return record ? record.status.toLowerCase() : '';
+}
+
+
+function getStatusIcon(userId, day) {
+  const record = getAbsensiRecord(userId, day);
+  if (!record) return 'fas fa-minus text-muted';
+  switch(record.status) {
+    case 'Hadir': return 'fas fa-check text-success';
+    case 'Izin': return 'fas fa-envelope text-warning';
+    case 'Sakit': return 'fas fa-procedures text-info';
+    case 'Alpa': return 'fas fa-times text-danger';
+    default: return 'fas fa-minus text-muted';
+  }
 }
 
 function getUserAvatar(userId) {
@@ -936,30 +997,52 @@ async function checkAttendanceToday() {
 }
 
 
+async function checkSelfAttendanceStatus(date) {
+  if (!userId || isAdmin.value || !date) return;
+  isCheckingAttendance.value = true;
+  attendanceToday.value = null; // Reset dulu
+  try {
+    const response = await axios.get(`${apiBaseUrl}/api/absensi/status/${userId}/${date}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    attendanceToday.value = response.data;
+  } catch (error) {
+    // Ini normal jika tidak ada data, jadi kita biarkan attendanceToday null
+    if (error.response?.status !== 404) {
+        console.error("Gagal memeriksa status absensi:", error);
+    }
+  } finally {
+    isCheckingAttendance.value = false;
+  }
+}
+
+
+
 async function markSelfAttendance(status, reason = null) {
   if (attendanceToday.value) {
-    showNotification('Anda sudah melakukan absensi hari ini.', 'info');
+    showNotification('Anda sudah melakukan absensi untuk tanggal ini.', 'info');
     return;
   }
 
   isSubmittingAttendance.value = true;
   try {
-    const today = new Date().toISOString().slice(0, 10);
-    const payload = {
-      tanggal: today,
+
+    const payload = { 
+      tanggal: selfAttendanceDate.value,
       status: status,
       kelas: namaKelas.value,
       keterangan: reason
     };
 
-    await axios.post(`${apiBaseUrl}/api/absensi/mandiri`, payload, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    await axios.post(`${apiBaseUrl}/api/absensi/mandiri`, payload, { 
+      headers: { 'Authorization': `Bearer ${token}` } 
     });
-
+    
     showNotification('Kehadiran berhasil dicatat!', 'success');
-    await checkAttendanceToday();
-    await fetchAbsensiBulanan();
+    await checkSelfAttendanceStatus(selfAttendanceDate.value); 
+    await fetchAbsensiBulanan(); 
     closeAttendanceModal();
+
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Gagal mencatat kehadiran.';
     showNotification(errorMessage, 'error');
@@ -967,6 +1050,17 @@ async function markSelfAttendance(status, reason = null) {
     isSubmittingAttendance.value = false;
   }
 }
+
+
+
+const isSelectedDateAScheduleDay = computed(() => {
+  if (!selfAttendanceDate.value) return false;
+ 
+  const date = new Date(selfAttendanceDate.value);
+  const dayIndex = date.getUTCDay(); 
+  const dayName = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][dayIndex];
+  return jadwalList.value.some(jadwal => jadwal.hari === dayName);
+});
 
 
 function openAttendanceForm(status) {
@@ -1321,10 +1415,18 @@ async function loadAllClassData() {
 }
 
 
+
+watch(selfAttendanceDate, (newDate) => {
+  if (newDate) {
+    checkSelfAttendanceStatus(newDate);
+  }
+});
+
 watch(activeView, (newView) => {
   if (newView === 'absensi' && !isAdmin.value) {
     checkAttendanceToday();
   }
+  
 });
 
 
@@ -1341,9 +1443,9 @@ watch(() => route.params.namaKelas, (newKelas) => {
 
 onMounted(() => {
   loadAllClassData();
-  if (activeView.value === 'absensi' && !isAdmin.value) {
-        checkAttendanceToday();
-    }
+  if (!isAdmin.value) {
+            checkSelfAttendanceStatus(selfAttendanceDate.value);
+        }
 });
 </script>
 
@@ -1860,6 +1962,29 @@ onMounted(() => {
   margin-right: 0.8rem;
   border: 2px solid #ddd;
 }
+
+.date-picker-user {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-picker-user label {
+  font-weight: 500;
+  color: #555;
+}
+
+.date-picker-user input[type="date"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+  max-width: 200px;
+  text-align: center;
+}
+
 
 /* Attendance Status Colors */
 .hadir { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
