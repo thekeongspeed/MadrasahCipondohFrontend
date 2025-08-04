@@ -622,7 +622,7 @@ const dataInfoKelas = {
   'pra-nikah': {
     nama: 'Pra Nikah',
     deskripsi: 'Membiasakan 29 Karakter Luhur Jama\'ah untuk Mempersiapkan bekal membangun keluarga sakinah mawaddah warohmah',
-    fotoUrl: '/foto-pra-nikah.jpg',
+    fotoUrl: '/foto-pra-nikah.jpeg',
     rentangUsia: { min: "18+ ", max: " Belum Menikah" },
     icon: 'fas fa-heart'
   }
