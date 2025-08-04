@@ -110,20 +110,59 @@
             <div class="section-header">
               <h2><i class="fas fa-clipboard-check"></i> Absensi Santri</h2>
               <div class="view-switcher" v-if="isAdmin">
-                <button 
-                  :class="{ active: absensiView === 'daftar' }" 
-                  @click="absensiView = 'daftar'; fetchAbsensiBulanan()"
-                >
-                  <i class="fas fa-list"></i> Rekap
+                 <button 
+                    :class="{ active: absensiView === 'daftar' }" 
+                    @click="absensiView = 'daftar'; fetchAbsensiBulanan()"
+                  >
+                    <i class="fas fa-list"></i> Rekap
+                  </button>
+                  <button 
+                    :class="{ active: absensiView === 'form' }" 
+                    @click="absensiView = 'form'; fetchAbsensi()"
+                  >
+                    <i class="fas fa-edit"></i> Input
+                  </button>
+                      </div>
+                    </div>
+
+
+
+            <div v-if="!isAdmin" class="self-attendance-section">
+          <h4><i class="fas fa-hand-pointer"></i> Absen Hari Ini</h4>
+          <div v-if="isCheckingAttendance" class="loading-spinner small">
+            <i class="fas fa-spinner fa-spin"></i> Memeriksa status...
+          </div>
+          <div v-else class="attendance-status-box">
+            <div v-if="attendanceToday">
+              <p class="status-text">
+                Anda tercatat <strong>{{ attendanceToday.status }}</strong> pada hari ini.
+              </p>
+              <p v-if="attendanceToday.keterangan" class="reason-text">
+                Keterangan: {{ attendanceToday.keterangan }}
+              </p>
+              <div v-if="attendanceToday.markedBy === 'admin'" class="edited-by-admin">
+                <i class="fas fa-user-shield"></i> Diubah oleh Admin
+              </div>
+            </div>
+            <div v-else>
+              <p v-if="!isTodayAScheduleDay" class="status-text-muted">
+                Tidak ada jadwal pengajian hari ini.
+              </p>
+              <div v-else class="attendance-options">
+                <button @click="markSelfAttendance('Hadir')" class="styled-button present-btn">
+                  <i class="fas fa-calendar-check"></i> Hadir
                 </button>
-                <button 
-                  :class="{ active: absensiView === 'form' }" 
-                  @click="absensiView = 'form'; fetchAbsensi()"
-                >
-                  <i class="fas fa-edit"></i> Input
+                <button @click="openAttendanceForm('Izin')" class="styled-button excused-btn">
+                  <i class="fas fa-envelope-open-text"></i> Izin
+                </button>
+                <button @click="openAttendanceForm('Sakit')" class="styled-button sick-btn">
+                  <i class="fas fa-head-side-virus"></i> Sakit
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+             
             
             <div v-if="absensiView === 'daftar' || !isAdmin">
               <div class="month-selector">
@@ -584,6 +623,14 @@ const token = localStorage.getItem('token');
 const loading = ref(false);
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const showNotification = inject('showNotification');
+const userId = localStorage.getItem('userId'); 
+const attendanceToday = ref(null);
+const isCheckingAttendance = ref(false);
+const showAttendanceModal = ref(false);
+const selectedStatus = ref('');
+const attendanceReason = ref('');
+const isSubmittingAttendance = ref(false);
+
 
 // Enhanced class information
 const dataInfoKelas = {
@@ -856,6 +903,85 @@ function nextMonth() {
   selectedMonth.value = `${newYear}-${String(newMonth).padStart(2, '0')}`;
   fetchAbsensiBulanan();
 }
+
+
+const isTodayAScheduleDay = computed(() => {
+  const todayIndex = new Date().getDay();
+  const todayDayName = days[todayIndex];
+  return jadwalList.value.some(jadwal => jadwal.hari === todayDayName);
+});
+
+
+
+
+async function checkAttendanceToday() {
+  if (!userId || isAdmin.value) return;
+  isCheckingAttendance.value = true;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    // Endpoint ini perlu Anda buat di backend
+    const response = await axios.get(`${apiBaseUrl}/api/absensi/status/${userId}/${today}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    attendanceToday.value = response.data; 
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      attendanceToday.value = null;
+    } else {
+      console.error('Gagal memeriksa status absensi hari ini:', error);
+    }
+  } finally {
+    isCheckingAttendance.value = false;
+  }
+}
+
+
+async function markSelfAttendance(status, reason = null) {
+  if (attendanceToday.value) {
+    showNotification('Anda sudah melakukan absensi hari ini.', 'info');
+    return;
+  }
+
+  isSubmittingAttendance.value = true;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const payload = {
+      tanggal: today,
+      status: status,
+      kelas: namaKelas.value,
+      keterangan: reason
+    };
+
+    await axios.post(`${apiBaseUrl}/api/absensi/mandiri`, payload, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    showNotification('Kehadiran berhasil dicatat!', 'success');
+    await checkAttendanceToday();
+    await fetchAbsensiBulanan();
+    closeAttendanceModal();
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Gagal mencatat kehadiran.';
+    showNotification(errorMessage, 'error');
+  } finally {
+    isSubmittingAttendance.value = false;
+  }
+}
+
+
+function openAttendanceForm(status) {
+  selectedStatus.value = status;
+  attendanceReason.value = '';
+  showAttendanceModal.value = true;
+}
+
+
+function closeAttendanceModal() {
+  showAttendanceModal.value = false;
+}
+
+
+
 
 // --- Pengumuman Logic ---
 const pengumumanView = ref('list');
@@ -1194,6 +1320,14 @@ async function loadAllClassData() {
   }
 }
 
+
+watch(activeView, (newView) => {
+  if (newView === 'absensi' && !isAdmin.value) {
+    checkAttendanceToday();
+  }
+});
+
+
 watch(() => route.params.namaKelas, (newKelas) => {
   if (newKelas && newKelas !== namaKelas.value) {
     namaKelas.value = newKelas;
@@ -1207,6 +1341,9 @@ watch(() => route.params.namaKelas, (newKelas) => {
 
 onMounted(() => {
   loadAllClassData();
+  if (activeView.value === 'absensi' && !isAdmin.value) {
+        checkAttendanceToday();
+    }
 });
 </script>
 
@@ -1759,6 +1896,63 @@ onMounted(() => {
   font-size: 1rem;
   cursor: pointer;
 }
+
+
+
+/* absen mandiri */
+
+.self-attendance-section {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+.attendance-options {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.edited-by-admin {
+  font-size: 0.8rem;
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 20px;
+  padding: 3px 10px;
+  display: inline-block;
+  margin-top: 5px;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background-color: white;
+  padding: 25px 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  position: relative;
+}
+.close-button {
+  position: absolute;
+  top: 10px; right: 15px;
+  background: none; border: none;
+  font-size: 2rem;
+  color: #aaa;
+  cursor: pointer;
+}
+
+
 
 /* Announcements Section */
 .announcements-container {
