@@ -111,6 +111,7 @@
               <div class="avatar-edit-wrapper">
                 <img 
                   :src="imagePreview || fullProfilePictureUrl"
+                  @error="handleImageError"
                   alt="Preview Foto Profil" 
                   class="avatar-preview"
                 >
