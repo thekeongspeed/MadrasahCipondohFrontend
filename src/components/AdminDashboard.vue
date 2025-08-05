@@ -128,8 +128,9 @@
                   <div class="card-header">
                     <div class="user-avatar">
                       <img 
-                          v-if="user.profilePicture && user.profilePicture !== '/default-profile.png'" 
+                          v-if="user.profilePicture && user.profilePicture !== '/default-profile.png' && !imageErrorState[user.id]" 
                           :src="getProfilePictureUrl(user.profilePicture)" 
+                          @error="handleImageError ($event, user.id)"
                           :alt="user.fullName">
                         <span v-else class="avatar-initial">{{ getInitials(user.fullName) }}</span>
                       </div>
@@ -252,9 +253,9 @@
         </div>
         
         <div class="modal-footer">
-          <button class="modal-button secondary" @click="closeModal">Tutup</button>
-          <button class="modal-button primary" @click="openEditModal(selectedUser)">Edit Data</button>
           <button  class="action-button delete" @click.stop="deleteUser($event, selectedUser)">Hapus</button>
+          <button class="modal-button primary" @click="openEditModal(selectedUser)">Edit Data</button>
+          <button class="modal-button secondary" @click="closeModal">Tutup</button>
         </div>
       </div>
     </div>
@@ -541,11 +542,18 @@ function getProfilePictureUrl(picturePath) {
     return picturePath;
   }
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
-  // Gabungkan base URL dengan path gambar
-  // Pastikan tidak ada garis miring ganda (//)
   return `${apiUrl.replace(/\/$/, '')}/${picturePath.replace(/^\//, '')}`;
 }
+
+const imageErrorState = ref({});
+const handleImageError = (event, userId) => {
+   if (event && event.target) {
+    event.target.style.display = 'none';
+  }
+
+ imageErrorState.value[userId] = true;
+};
+
 
 
 const router = useRouter();
@@ -968,8 +976,8 @@ onMounted(fetchUsers);
  display: flex;
  justify-content: center;
  align-items: center;
- background-color: #f0f2f5; /* Warna latar belakang inisial */
- color: #495057; /* Warna teks inisial */
+ background-color: #f0f2f5;
+ color: #495057;
  font-weight: bold;
  font-size: 0.9rem;
  border-radius: 50%;
@@ -1150,8 +1158,11 @@ onMounted(fetchUsers);
 .modal-header {
   display: flex;
   align-items: center;
+  justify-content: center; /* Tambahkan ini untuk pusatkan horizontal */
   padding: 2rem 2rem 1rem;
   border-bottom: 1px solid #cfd8dc;
+  text-align: center; /* Tambahkan ini untuk pusatkan teks */
+  flex-direction: column; /* Ubah ke column layout */
 }
 
 .modal-avatar {
@@ -1163,7 +1174,8 @@ onMounted(fetchUsers);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1.5rem;
+  margin-right: 0; /* Hapus margin right karena sekarang column layout */
+  margin-bottom: 1rem; /* Tambahkan margin bottom untuk jarak dengan teks */
   font-weight: 600;
   font-size: 1.5rem;
   flex-shrink: 0;
@@ -1171,7 +1183,12 @@ onMounted(fetchUsers);
 
 .modal-user-info {
   flex-grow: 1;
+  width: 100%; /* Pastikan mengambil lebar penuh */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Pusatkan konten secara horizontal */
 }
+
 
 .modal-user-info h2 {
   margin: 0;
@@ -1405,7 +1422,7 @@ onMounted(fetchUsers);
   transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Tambah transisi */
 }
 
-/* Efek saat input sedang aktif/di-klik */
+
 .input-group input:focus,
 .input-group textarea:focus {
   outline: none;
