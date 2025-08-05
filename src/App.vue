@@ -16,6 +16,7 @@
       </main>
     </div>
     
+    <Footer v-if="showNavbar" />
     <Notification 
       :message="notification.message" 
       :type="notification.type"
@@ -29,6 +30,7 @@ import { computed, ref, provide } from 'vue';
 import { useRoute } from 'vue-router';
 import Navbar from './components/Navbar.vue';
 import Notification from './components/Notification.vue';
+import Footer from './components/Footer.vue';
 
 const route = useRoute();
 
@@ -174,12 +176,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #014283;
+  background: #bac1c8;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0277bd;
+  background: #676868;
 }
 
 /* Responsive Adjustments */

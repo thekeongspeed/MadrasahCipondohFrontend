@@ -178,6 +178,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 
+const isLoggedIn = ref(false);
+const userName = ref('');
+
 // Floating elements animation
 const floatingElementStyle = (i) => {
   const size = Math.random() * 20 + 10;
@@ -297,7 +300,13 @@ const scrollToContent = () => {
 
 // On mounted
 onMounted(() => {
-  // Add any initialization code here
+  const token = localStorage.getItem('token');
+  isLoggedIn.value = !!token; 
+
+  if (isLoggedIn.value) {
+    userName.value = localStorage.getItem('userName') || 'Pengguna';
+  }
+
 });
 </script>
 
