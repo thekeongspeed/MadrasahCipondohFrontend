@@ -228,7 +228,7 @@
                       </div>
                   </div>
                   
-                  <div v-for="user in userList" :key="user?.id" v-if="user" class="grid-row">
+                  <div v-for="user in userList" :key="user.id" class="grid-row">
                     <div class="row-cell name-cell">
                       <img :src="`${apiBaseUrl}${user.profilePicture || '/default-profile.png'}`" 
                             class="author-avatar"
@@ -446,7 +446,7 @@
                               <div class="comment-header">
                                 <div class="comment-user">
                                   <img 
-                                    :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-profile.png'}`" 
+                                    :src="`${apiBaseUrl}/default-profile.png`" 
                                     class="comment-avatar"
                                     @error="handleImageError"
                                   >
@@ -917,14 +917,24 @@ async function fetchAbsensi() {
 async function fetchAbsensiBulanan() {
   absensiLoading.value = true;
   try {
-  
+      await fetchAllUsers();
+
+       if (userList.value.length === 0) {
+      absensiData.value = [];
+      return; 
+    }
+
+   
     const response = await axios.get(`${apiBaseUrl}/api/absensi/rekap/${namaKelas.value}/${selectedMonth.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     absensiData.value = response.data;
+
   } catch (error) {
     console.error('Gagal mengambil data absensi bulanan:', error);
-    absensiData.value = [];
+   
+    absensiData.value = []; 
+    showNotification('Gagal memuat data rekap absensi.', 'error');
   } finally {
     absensiLoading.value = false;
   }
@@ -1550,8 +1560,6 @@ async function loadAllClassData() {
   loading.value = true;
   try {
 
-    await fetchAllUsers();
-
       await Promise.all([
       fetchJadwal(),
       fetchAbsensiBulanan(), 
@@ -1561,6 +1569,7 @@ async function loadAllClassData() {
     ]);
   } catch (error) {
       console.error("Gagal memuat semua data kelas:", error);
+      showNotification('Gagal memuat data kelas.', 'error');
       
   }
   finally {

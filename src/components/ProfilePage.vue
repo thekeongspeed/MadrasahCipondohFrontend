@@ -946,6 +946,7 @@ input[type="file"] {
   font-size: 1rem;
   transition: all 0.2s ease;
   background-color: #f9f9f9;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
