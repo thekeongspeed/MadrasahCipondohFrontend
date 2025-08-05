@@ -219,12 +219,16 @@
                 <div class="attendance-grid">
                   <div class="grid-header">
                     <div class="header-cell name-cell">Nama</div>
-                    <div v-for="day in totalHari" :key="day" class="header-cell day-cell">
-                      {{ day }}
-                    </div>
+                    <div 
+                      v-for="day in totalHari" 
+                          :key="day" 
+                          class="header-cell day-cell"
+                        >
+                          {{ day }}
+                      </div>
                   </div>
                   
-                  <div v-for="user in userList" :key="user.id" class="grid-row">
+                  <div v-for="user in userList" :key="user?.id" v-if="user" class="grid-row">
                     <div class="row-cell name-cell">
                       <img :src="`${apiBaseUrl}${user.profilePicture || '/default-profile.png'}`" 
                             class="author-avatar"
@@ -236,7 +240,7 @@
                       :key="day" 
                       :class="['row-cell', 'day-cell', getStatusClass(user.id, day)]"
                       :title="getAbsensiTooltip(user.id, day)"
-                    >
+                        @click="openEditModal(user, day)" >            
                       <i :class="getStatusIcon(user.id, day)"></i>
                     </div>
                   </div>
@@ -281,6 +285,45 @@
           </section>
         </div>
       </transition>
+
+      <transition name="fade">
+  <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
+    <div class="modal-content" v-if="editingRecord">
+      <button @click="closeEditModal" class="close-button">&times;</button>
+      <h3>Edit Absensi</h3>
+      <div class="edit-info">
+        <span><i class="fas fa-user"></i> {{ editingRecord.fullName }}</span>
+        <span><i class="fas fa-calendar-alt"></i> {{ new Date(editingRecord.tanggal).toLocaleDateString('id-ID', { dateStyle: 'full' }) }}</span>
+      </div>
+      
+      <form @submit.prevent="saveAttendanceEdit">
+        <div class="form-group">
+          <label for="edit-status">Status</label>
+          <select id="edit-status" v-model="editingRecord.status">
+            <option v-for="stat in availableStatuses" :key="stat" :value="stat">
+              {{ stat }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group" v-if="editingRecord.status === 'Izin' || editingRecord.status === 'Sakit'">
+          <label for="edit-keterangan">Keterangan</label>
+          <textarea 
+            id="edit-keterangan"
+            v-model="editingRecord.keterangan"
+            rows="4"
+            placeholder="Isi alasan..."
+          ></textarea>
+        </div>
+        
+        <button type="submit" class="styled-button primary">
+          <i class="fas fa-save"></i> Simpan Perubahan
+        </button>
+      </form>
+    </div>
+  </div>
+</transition>
+
 
       <!-- Pengumuman Section -->
       <transition name="fade-slide" mode="out-in">
@@ -466,7 +509,7 @@
                       <div class="card-header">
                         <div class="author-info">
                           <img 
-                            :src="`${apiBaseUrl}${komen.author?.profilePicture || '/default-profile.png'}`" 
+                            :src="`${apiBaseUrl}/default-profile.png`" 
                                     class="comment-avatar"
                                     @error="handleImageError"
                           >
@@ -667,6 +710,8 @@ const selectedStatus = ref('');
 const attendanceReason = ref('');
 const isSubmittingAttendance = ref(false);
 const selfAttendanceDate = ref(new Date().toISOString().slice(0, 10));
+const showEditModal = ref(false);
+const editingRecord = ref(null);
 
 
 // Enhanced class information
@@ -806,42 +851,57 @@ const totalHari = computed(() => {
 
 async function fetchAllUsers() {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/users/kelas/${namaKelas.value}`, { 
+    const response = await axios.get(`${apiBaseUrl}/api/users/kelas/${namaKelas.value}`, { 
       headers: { 'Authorization': `Bearer ${token}` } 
     });
-    userList.value = response.data;
+    
+   if (Array.isArray(response.data)) {
+        userList.value = response.data.filter(user => user && user.id);
+    } else {
+        userList.value = [];
+    }
+
   } catch (error) { 
     console.error("Gagal mengambil daftar user:", error);
     userList.value = [];
   }
 }
 
+
+
 async function fetchAbsensi() {
   absensiLoading.value = true;
   try {
-      await fetchAllUsers();
-     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/absensi/${namaKelas.value}/${selectedDate.value}`, {
+    await fetchAllUsers(); 
+
+     const response = await axios.get(`${apiBaseUrl}/api/absensi/${namaKelas.value}/${selectedDate.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
+    const existingAttendance = response.data;
+
+
     absensiList.value = userList.value.map(user => {
-      const userAttendance = response.data.find(att => {
-        if (!att.userId) return false;
-        const id = typeof att.userId === 'string' ? att.userId : att.userId.id;
-        return id === user.id;
+
+      const userAttendance = existingAttendance.find(att => {
+       
+        const userIdFromAtt = att.userId?.id || att.userId;
+        return userIdFromAtt === user.id;
       });
 
+      
       return {
         userId: user.id,
         fullName: user.fullName || user.username,
         profilePicture: user.profilePicture,
         tanggal: selectedDate.value,
+      
         status: userAttendance ? userAttendance.status : 'Alpa'
-        
       };
     });
+
   } catch (error) {
     console.error('Gagal mengambil data absensi:', error);
+
     absensiList.value = userList.value.map(user => ({
       userId: user.id,
       fullName: user.fullName || user.username,
@@ -857,8 +917,8 @@ async function fetchAbsensi() {
 async function fetchAbsensiBulanan() {
   absensiLoading.value = true;
   try {
-     await fetchAllUsers(); 
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/absensi/rekap/${namaKelas.value}/${selectedMonth.value}`, {
+  
+    const response = await axios.get(`${apiBaseUrl}/api/absensi/rekap/${namaKelas.value}/${selectedMonth.value}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     absensiData.value = response.data;
@@ -869,6 +929,9 @@ async function fetchAbsensiBulanan() {
     absensiLoading.value = false;
   }
 }
+
+
+
 
 async function saveAbsensi() {
   try {
@@ -1075,7 +1138,89 @@ function closeAttendanceModal() {
 }
 
 
+const availableStatuses = computed(() => {
+  if (isAdmin.value) {
+    return ['Hadir', 'Izin', 'Sakit', 'Alpa'];
+  }
+  // User tidak bisa menandai dirinya sendiri 'Alpa'
+  return ['Hadir', 'Izin', 'Sakit'];
+});
 
+
+function openEditModal(user, day) {
+   if (!user || !user.id) {
+    console.error("Fungsi openEditModal dipanggil tanpa user yang valid.");
+    return; 
+  }
+
+  const record = getAbsensiRecord(user.id, day);
+   const canEdit = isAdmin.value || (record && record.userId === userId) || (!record && user.id === userId);
+  
+  if (!canEdit) {
+      return;
+  }
+
+
+  const dateString = `${selectedMonth.value}-${String(day).padStart(2, '0')}`;
+  
+  editingRecord.value = record ? { ...record, fullName: user.fullName } : {
+    id: null, 
+    userId: user.id,
+    fullName: user.fullName,
+    tanggal: dateString,
+    status: 'Hadir', 
+    keterangan: ''
+  };
+  
+  showEditModal.value = true;
+}
+
+
+
+function closeEditModal() {
+  showEditModal.value = false;
+  editingRecord.value = null;
+}
+
+
+async function saveAttendanceEdit() {
+  if (!editingRecord.value) return;
+
+  const { id, status, keterangan } = editingRecord.value;
+  
+
+  const payload = {
+      status,
+      keterangan: (status === 'Izin' || status === 'Sakit') ? keterangan : null
+  };
+
+  try {
+  
+    if (id) {
+      await axios.put(`${apiBaseUrl}/api/absensi/${id}`, payload, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } else {
+
+      const createPayload = {
+          ...payload,
+          tanggal: editingRecord.value.tanggal,
+          kelas: namaKelas.value
+      };
+      await axios.post(`${apiBaseUrl}/api/absensi/mandiri`, createPayload, {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
+    }
+
+    showNotification('Absensi berhasil disimpan!', 'success');
+    closeEditModal();
+    await fetchAbsensiBulanan();
+
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Gagal menyimpan perubahan.';
+    showNotification(errorMessage, 'error');
+  }
+}
 
 // --- Pengumuman Logic ---
 const pengumumanView = ref('list');
@@ -1400,16 +1545,25 @@ function handleImageError(event) {
   event.target.src = '/default-profile.png';
 }
 
+
 async function loadAllClassData() {
   loading.value = true;
   try {
-    await Promise.all([
+
+    await fetchAllUsers();
+
+      await Promise.all([
       fetchJadwal(),
-      fetchAllUsers().then(() => Promise.all([fetchAbsensiBulanan(), fetchAbsensi()])),
+      fetchAbsensiBulanan(), 
+      fetchAbsensi(),         
       fetchPengumuman(),
       fetchJurnalBulanan()
     ]);
-  } finally {
+  } catch (error) {
+      console.error("Gagal memuat semua data kelas:", error);
+      
+  }
+  finally {
     loading.value = false;
   }
 }
@@ -1953,6 +2107,35 @@ onMounted(() => {
 .row-cell.day-cell {
   font-size: 0.9rem;
 }
+
+
+.editable-cell {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.editable-cell:hover {
+  background-color: #e9ecef; 
+  border-radius: 4px;
+}
+
+.edit-info {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  color: #495057;
+}
+
+.edit-info span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 
 .user-avatar {
   width: 30px;
