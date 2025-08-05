@@ -155,7 +155,7 @@
               </div>
             </div>
             <div v-else>
-              <p v-if="!isTodayAScheduleDay" class="status-text-muted">
+              <p v-if="!isSelectedDateAScheduleDay" class="status-text-muted">
                 Tidak ada jadwal pengajian hari ini.
               </p>
               <div v-else class="attendance-options">
