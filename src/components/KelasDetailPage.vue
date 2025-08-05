@@ -120,7 +120,7 @@
                     :class="{ active: absensiView === 'form' }" 
                     @click="absensiView = 'form'; fetchAbsensi()"
                   >
-                    <i class="fas fa-edit"></i> Input
+                    <i class="fas fa-edit"></i> Edit
                   </button>
                       </div>
                     </div>
@@ -703,7 +703,6 @@ const loading = ref(false);
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const showNotification = inject('showNotification');
 const userId = localStorage.getItem('userId'); 
-const attendanceToday = ref(null);
 const isCheckingAttendance = ref(false);
 const showAttendanceModal = ref(false);
 const selectedStatus = ref('');
@@ -1046,6 +1045,29 @@ const isTodayAScheduleDay = computed(() => {
 });
 
 
+const attendanceToday = computed(() => {
+   if (isAdmin.value || !selfAttendanceDate.value) {
+    return null;
+  }
+  
+  const currentUserId = localStorage.getItem('userId');
+  const selectedDate = new Date(selfAttendanceDate.value);
+  
+ 
+  const targetDay = selectedDate.getUTCDate();
+  const targetMonth = selectedDate.getUTCMonth() + 1; 
+  const targetYear = selectedDate.getUTCFullYear();
+
+    return absensiData.value.find(absen => {
+    if (!absen.userId) return false;
+
+    const absenDate = new Date(absen.tanggal);
+    return absen.userId === currentUserId &&
+           absenDate.getUTCDate() === targetDay &&
+           absenDate.getUTCMonth() + 1 === targetMonth &&
+           absenDate.getUTCFullYear() === targetYear;
+  }) || null;
+});
 
 
 async function checkAttendanceToday() {
@@ -1053,7 +1075,7 @@ async function checkAttendanceToday() {
   isCheckingAttendance.value = true;
   try {
     const today = new Date().toISOString().slice(0, 10);
-    // Endpoint ini perlu Anda buat di backend
+
     const response = await axios.get(`${apiBaseUrl}/api/absensi/status/${userId}/${today}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -1073,20 +1095,10 @@ async function checkAttendanceToday() {
 async function checkSelfAttendanceStatus(date) {
   if (!userId || isAdmin.value || !date) return;
   isCheckingAttendance.value = true;
-  attendanceToday.value = null; // Reset dulu
-  try {
-    const response = await axios.get(`${apiBaseUrl}/api/absensi/status/${userId}/${date}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    attendanceToday.value = response.data;
-  } catch (error) {
-    // Ini normal jika tidak ada data, jadi kita biarkan attendanceToday null
-    if (error.response?.status !== 404) {
-        console.error("Gagal memeriksa status absensi:", error);
-    }
-  } finally {
+    
+  setTimeout(() => {
     isCheckingAttendance.value = false;
-  }
+  }, 200); 
 }
 
 
@@ -1196,34 +1208,25 @@ function closeEditModal() {
 async function saveAttendanceEdit() {
   if (!editingRecord.value) return;
 
-  const { id, status, keterangan } = editingRecord.value;
-  
-
-  const payload = {
-      status,
-      keterangan: (status === 'Izin' || status === 'Sakit') ? keterangan : null
+    const payload = {
+    status: editingRecord.value.status,
+    keterangan: (editingRecord.value.status === 'Izin' || editingRecord.value.status === 'Sakit') 
+                  ? editingRecord.value.keterangan 
+                  : null,
+    tanggal: editingRecord.value.tanggal,
+    kelas: namaKelas.value,
+    userId: editingRecord.value.userId 
   };
 
   try {
-  
-    if (id) {
-      await axios.put(`${apiBaseUrl}/api/absensi/${id}`, payload, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-    } else {
+   
+    await axios.post(`${apiBaseUrl}/api/absensi/admin`, payload, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-      const createPayload = {
-          ...payload,
-          tanggal: editingRecord.value.tanggal,
-          kelas: namaKelas.value
-      };
-      await axios.post(`${apiBaseUrl}/api/absensi/mandiri`, createPayload, {
-          headers: { 'Authorization': `Bearer ${token}` }
-      });
-    }
-
-    showNotification('Absensi berhasil disimpan!', 'success');
+    showNotification('Absensi berhasil disimpan oleh Admin!', 'success');
     closeEditModal();
+   
     await fetchAbsensiBulanan();
 
   } catch (error) {
@@ -1231,6 +1234,8 @@ async function saveAttendanceEdit() {
     showNotification(errorMessage, 'error');
   }
 }
+
+
 
 // --- Pengumuman Logic ---
 const pengumumanView = ref('list');

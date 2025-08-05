@@ -70,7 +70,7 @@
         <div v-if="isLoggedIn" class="user-profile-mobile">
           <router-link to="/profil">
             <div class="profile-picture-container">
-              <img :src="profilePictureUrl" alt="Foto Profil" class="profile-picture-mobile" />
+              <img :src="profilePictureUrl" @error="handleImageError" alt="Foto Profil" class="profile-picture-mobile" />
               <span class="online-indicator" :class="{ 'online': isUserOnline }"></span>
             </div>
           </router-link>
