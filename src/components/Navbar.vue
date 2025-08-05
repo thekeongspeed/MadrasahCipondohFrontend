@@ -39,7 +39,7 @@
           <div class="profile-dropdown">
             <router-link to="/profil" class="profile-link">
               <div class="profile-picture-container">
-                <img :src="profilePictureUrl" alt="Foto Profil" class="profile-picture" />
+                <img :src="profilePictureUrl" @error="handleImageError" alt="Foto Profil" class="profile-picture" />
                 <span class="online-indicator" :class="{ 'online': isUserOnline }"></span>
               </div>
               <div class="profile-info">
@@ -239,12 +239,27 @@ const router = useRouter();
 const isLoggedIn = computed(() => !!localStorage.getItem('token'));
 const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin');
 
-const BACKEND_BASE_URL = 'https://madrasahcipondohbackend-production.up.railway.app';
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
+
 const profilePictureUrl = computed(() => {
   const path = localStorage.getItem('userProfilePicture');
-  if (!path) return '/default-profile.png';
-  return path.startsWith('http') ? path : `${BACKEND_BASE_URL}${path}`;
+
+    if (!path || path === 'null' || path === 'undefined') {
+    return '/default-profile.png'; 
+  }
+
+   if (path.startsWith('http')) {
+    return path;
+  }
+  
+   return `${BACKEND_BASE_URL}${path}`;
 });
+
+
+const handleImageError = (event) => {
+  event.target.src = '/default-profile.png';
+}
+
 
 function logout() {
   localStorage.removeItem('token');

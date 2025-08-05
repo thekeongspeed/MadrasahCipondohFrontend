@@ -273,9 +273,9 @@ const notificationClass = computed(() => {
   return notificationType.value || 'info';
 });
 
-// Methods
-function handleImageError(e) {
-  e.target.src = serverUrl + '/default-profile.png';
+
+const handleImageError = (event) => {
+  event.target.src = '/default-profile.png';
 }
 
 function handleFileChange(event) {
