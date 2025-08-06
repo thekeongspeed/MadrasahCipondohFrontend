@@ -1,6 +1,7 @@
 <template>
   <div class="profile-container" v-if="user">
     <div class="profile-card" :class="{'is-student': user.role === 'user', 'is-admin': user.role === 'admin'}">
+
       <div class="profile-background"></div>
       
       <div class="avatar-section">
@@ -9,7 +10,7 @@
             :src="serverUrl + user.profilePicture" 
             alt="Foto Profil" 
             class="profile-avatar"
-            @error="e => e.target.src = serverUrl + '/default-profile.png'"
+            @error="handleImageError"
           >
           <div class="online-indicator" v-if="user.isOnline"></div>
         </div>
@@ -55,8 +56,17 @@
           <div class="stat-label">Kelas Aktif</div>
         </div>
       </div>
-    </div>
-  </div>
+  
+
+  <div class="footer-actions">
+        <button @click="goBack" class="back-to-page-button">
+          <i class="fas fa-arrow-left"></i>
+          <span>Kembali ke Kelas</span>
+        </button>
+      </div>
+          </div>
+  </div>
+  
   
   <div v-else-if="loading" class="loading-container">
     <div class="loading-spinner"></div>
@@ -68,14 +78,16 @@
     <p>{{ error }}</p>
     <button @click="retryLoading" class="retry-button">Coba Lagi</button>
   </div>
+
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios'; 
 
 const route = useRoute();
+const router = useRouter();
 const user = ref(null);
 const loading = ref(true);
 const serverUrl = import.meta.env.VITE_API_BASE_URL; 
@@ -123,6 +135,15 @@ async function fetchUserProfile() {
 function retryLoading() {
   fetchUserProfile();
 }
+
+const handleImageError = (event) => {
+  event.target.src = '/default-profile.png';
+}
+
+function goBack() {
+  router.back();
+}
+
 
 onMounted(() => {
   fetchUserProfile();
@@ -408,6 +429,85 @@ onMounted(() => {
   transform: translateY(-2px);
 }
 
+
+.footer-actions {
+  margin: 2.5rem 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.back-to-page-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2rem;
+  background: white;
+  color: #4a4a4a; /* Warna hitam soft */
+  border: 1px solid #e0e0e0;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.back-to-page-button i {
+  margin-right: 0.8rem;
+  color: #6b6b6b; /* Warna icon abu-abu medium */
+  transition: all 0.3s ease;
+}
+
+.back-to-page-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d0d0d0;
+  color: #333333; /* Warna sedikit lebih gelap saat hover */
+}
+
+.back-to-page-button:hover i {
+  color: #4a4a4a; /* Warna icon lebih gelap saat hover */
+  transform: translateX(-3px);
+}
+
+.back-to-page-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Efek garis bawah animasi */
+.back-to-page-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #4a4a4a;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.back-to-page-button:hover::after {
+  width: 70%;
+}
+
+/* Animasi untuk loading/klik */
+@keyframes gentlePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.back-to-page-button:focus {
+  animation: gentlePulse 0.4s ease;
+  outline: none;
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .profile-container {
@@ -431,5 +531,16 @@ onMounted(() => {
     width: 100px;
     height: 100px;
   }
+
+ .back-to-page-button {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .back-to-page-button i {
+    margin-right: 0.6rem;
+    font-size: 0.9rem;
+  }
+
 }
 </style>

@@ -315,10 +315,25 @@
             placeholder="Isi alasan..."
           ></textarea>
         </div>
-        
-        <button type="submit" class="styled-button primary">
-          <i class="fas fa-save"></i> Simpan Perubahan
-        </button>
+
+        <div class="form-actions">
+              
+              <button 
+                v-if="isAdmin && editingRecord.id"
+                type="button" 
+                @click="handleDeleteAbsensi" 
+                class="styled-button danger"
+              >
+                <i class="fas fa-trash"></i> Hapus Absensi
+              </button>
+
+              <button type="submit" class="styled-button primary">
+                <i class="fas fa-save"></i> Simpan Perubahan
+              </button>
+              
+            </div>
+
+       
       </form>
     </div>
   </div>
@@ -924,9 +939,15 @@ async function fetchAbsensiBulanan() {
     }
 
    
-    const response = await axios.get(`${apiBaseUrl}/api/absensi/rekap/${namaKelas.value}/${selectedMonth.value}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+      const cacheBuster = `?_t=${new Date().getTime()}`;
+    const url = `${apiBaseUrl}/api/absensi/rekap/${namaKelas.value}/${selectedMonth.value}${cacheBuster}`;
+    // =======================
+
+    const response = await axios.get(url, { 
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+
     absensiData.value = response.data;
 
   } catch (error) {
@@ -951,9 +972,44 @@ async function saveAbsensi() {
     }, { headers: { 'Authorization': `Bearer ${token}` } });
     // Show success notification
     showNotification('Absensi berhasil disimpan!');
+    await fetchAbsensiBulanan();
   } catch (error) { 
     console.error('Gagal menyimpan absensi:', error);
     // Show error to user
+  }
+}
+
+
+
+
+async function handleDeleteAbsensi() {
+ 
+  if (!editingRecord.value || !editingRecord.value.id) {
+    showNotification('Record absensi tidak ditemukan untuk dihapus.', 'error');
+    return;
+  }
+
+
+  if (!confirm('Anda yakin ingin menghapus data absensi ini? Aksi ini tidak dapat dibatalkan.')) {
+    return;
+  }
+
+  try {
+    
+    await axios.delete(`${apiBaseUrl}/api/absensi/${editingRecord.value.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+ 
+    showNotification('Absensi berhasil dihapus!', 'success');
+    closeEditModal();
+    
+    
+    await fetchAbsensiBulanan();
+
+  } catch (error) {
+    console.error('Gagal menghapus absensi:', error);
+    showNotification(error.response?.data?.message || 'Gagal menghapus absensi.', 'error');
   }
 }
 
@@ -1183,7 +1239,8 @@ function openEditModal(user, day) {
   }
 
 
-  const dateString = `${selectedMonth.value}-${String(day).padStart(2, '0')}`;
+  const formattedDay = String(day).padStart(2, '0');
+  const dateString = `${selectedMonth.value}-${formattedDay}`;
   
   editingRecord.value = record ? { ...record, fullName: user.fullName } : {
     id: null, 
@@ -2007,6 +2064,23 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
+.form-actions.spaced {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+
+.styled-button.danger {
+  background-color: #e74c3c;
+  border-color: #c0392b;
+  color: white;
+}
+
+.styled-button.danger:hover {
+  background-color: #c0392b;
+}
+
 .icon-button {
   width: 32px;
   height: 32px;
@@ -2307,7 +2381,7 @@ onMounted(() => {
 .author-info {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 1px;
   flex-grow: 1;
 }
 
@@ -2438,7 +2512,7 @@ onMounted(() => {
 .comment-user {
   display: flex;
   align-items: center;
-  gap: 10rem;
+  gap: 1px;
 }
 
 .comment-avatar {
@@ -2452,6 +2526,7 @@ onMounted(() => {
 .comment-user-info {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 2px;
 }
 
