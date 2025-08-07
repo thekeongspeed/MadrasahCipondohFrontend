@@ -217,7 +217,8 @@
               
               <div v-else class="attendance-container">
                 <div class="attendance-grid-wrapper">
-                <div class="attendance-grid">
+                <div class="attendance-grid"
+                :style="{ 'grid-template-columns': gridTemplateColumns }">
                   <div class="grid-header">
                     <div class="header-cell name-cell">Nama</div>
                     <div 
@@ -1620,6 +1621,16 @@ function handleImageError(event) {
 }
 
 
+const gridTemplateColumns = computed(() => {
+  const baseWidth = window.innerWidth < 480 ? '120px' : 
+                   window.innerWidth < 768 ? '140px' : '160px'
+  const dayWidth = window.innerWidth < 480 ? '35px' : 
+                  window.innerWidth < 768 ? '40px' : '50px'
+  
+  return `${baseWidth} repeat(${totalHari.value}, ${dayWidth})`
+})
+
+
 async function loadAllClassData() {
   loading.value = true;
   try {
@@ -2186,7 +2197,7 @@ onMounted(() => {
 
 .attendance-grid {
   display: inline-grid;
-  grid-template-columns: 200px repeat(31, 60px);
+  grid-template-columns: minmax(160px, 200px) repeat(var(--days-in-month), minmax(50px, 60px));
   border: 1px solid #e0e0e0;
 }
 
@@ -2943,7 +2954,7 @@ onMounted(() => {
   }
   
   .attendance-grid {
-    grid-template-columns: 150px repeat(31, 50px);
+    grid-template-columns: minmax(140px, 160px) repeat(var(--days-in-month), minmax(40px, 50px));
   }
 
    .header-cell, .row-cell {
@@ -3007,7 +3018,7 @@ onMounted(() => {
   }
   
   .attendance-grid {
-   grid-template-columns: 140px repeat(31, 40px);
+   grid-template-columns: minmax(120px, 140px) repeat(var(--days-in-month), minmax(35px, 40px));
   }
   
   .name-cell {
