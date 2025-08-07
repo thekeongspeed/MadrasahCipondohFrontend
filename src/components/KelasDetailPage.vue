@@ -216,6 +216,7 @@
               </div>
               
               <div v-else class="attendance-container">
+                <div class="attendance-grid-wrapper">
                 <div class="attendance-grid">
                   <div class="grid-header">
                     <div class="header-cell name-cell">Nama</div>
@@ -247,7 +248,8 @@
                 </div>
               </div>
             </div>
-            
+           </div>
+
             <div v-if="absensiView === 'form' && isAdmin">
               <div class="date-picker">
                 <label><i class="fas fa-calendar-day"></i> Pilih Tanggal:</label>
@@ -2146,17 +2148,46 @@ onMounted(() => {
 }
 
 .attendance-container {
+   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch; 
   margin-bottom: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 10px 0;
 }
+
+.attendance-grid-wrapper {
+  display: inline-block;
+  min-width: 100%;
+}
+
+
+/* Style scrollbar */
+.attendance-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.attendance-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.attendance-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.attendance-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 
 .attendance-grid {
   display: inline-grid;
-  grid-template-columns: auto repeat(31, 1fr);
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  min-width: 100%;
+  grid-template-columns: 200px repeat(31, 60px);
+  border: 1px solid #e0e0e0;
 }
 
 .grid-header, .grid-row {
@@ -2170,6 +2201,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 40px;
+  padding: 10px 8px;
+  text-align: center;
 }
 
 .header-cell {
@@ -2185,6 +2219,7 @@ onMounted(() => {
   left: 0;
   z-index: 2;
   background: white;
+  box-shadow: 2px 0 3px rgba(0,0,0,0.1);
 }
 
 .day-cell {
@@ -2908,7 +2943,24 @@ onMounted(() => {
   }
   
   .attendance-grid {
-    grid-template-columns: auto repeat(15, 1fr);
+    grid-template-columns: 150px repeat(31, 50px);
+  }
+
+   .header-cell, .row-cell {
+    min-width: 50px;
+    padding: 8px 5px;
+    font-size: 0.85rem;
+  }
+  
+  .name-cell {
+    min-width: 150px;
+    padding-left: 10px;
+  }
+  
+  .author-avatar {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
   }
   
   .journal-card {
@@ -2955,15 +3007,18 @@ onMounted(() => {
   }
   
   .attendance-grid {
-    grid-template-columns: auto repeat(7, 1fr);
+   grid-template-columns: 140px repeat(31, 40px);
   }
   
   .name-cell {
-    min-width: 150px;
+    min-width: 10px;
+    padding: 10px 8px 10px 5px;
   }
   
   .day-cell {
     min-width: 35px;
+    padding: 8px 3px;
+    font-size: 0.9em;
   }
 }
 </style>
