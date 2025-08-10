@@ -176,7 +176,14 @@ const jajaranPengurus = ref([
     jabatan: 'Koordinator Guru',
     fotoUrl: '/foto-profil-diyan.png',
     kontak: '+62 858-8940-9822',
-    kategori: ['pendidik', 'pengajar']
+    kategori: ['pendidik', 'pengajar', 'manajemen']
+  },
+   {
+    nama: 'Jihad Vatra Bimantara',
+    jabatan: 'Ketua Muda-Mudi',
+    fotoUrl: '/default-profile.png',
+    kontak: '+62 878-0001-9354',
+    kategori: 'manajemen'
   },
 ]);
 

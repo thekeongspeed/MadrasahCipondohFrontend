@@ -2231,10 +2231,12 @@ onMounted(() => {
   z-index: 2;
   background: white;
   box-shadow: 2px 0 3px rgba(0,0,0,0.1);
+  min-width: 150px;
+  padding-left: 10px;
 }
 
 .day-cell {
-  min-width: 40px;
+  min-width: 30px;
   height: 40px;
 }
 
