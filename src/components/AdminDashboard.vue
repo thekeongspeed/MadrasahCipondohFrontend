@@ -103,10 +103,12 @@
                     <td data-label="No." class="index-cell">{{ index + 1 }}</td>
                     <td data-label="Nama Lengkap" class="name-cell">
                       <div class="user-avatar">
-                     <img 
-                          v-if="user.profilePicture && user.profilePicture !== '/default-profile.png'" 
-                          :src="getProfilePictureUrl(user.profilePicture)" 
-                          :alt="user.fullName">
+                        <img 
+                            v-if="user.profilePicture && user.profilePicture !== '/default-profile.png' && !imageErrorState[user.id]" 
+                            :src="getProfilePictureUrl(user.profilePicture)" 
+                            @error="handleImageError(user.id)"
+                            :alt="user.fullName"
+                          >
                         <span v-else class="avatar-initial">{{ getInitials(user.fullName) }}</span>
                       </div>
                       {{ user.fullName || '-' }}
@@ -130,8 +132,9 @@
                       <img 
                           v-if="user.profilePicture && user.profilePicture !== '/default-profile.png' && !imageErrorState[user.id]" 
                           :src="getProfilePictureUrl(user.profilePicture)" 
-                          @error="handleImageError ($event, user.id)"
-                          :alt="user.fullName">
+                          @error="handleImageError(user.id)"
+                          :alt="user.fullName"
+                        >
                         <span v-else class="avatar-initial">{{ getInitials(user.fullName) }}</span>
                       </div>
                     <div class="card-user-info">
@@ -209,8 +212,9 @@
           <div class="modal-avatar">
             <span class="avatar-initial-large">
               <img 
-                v-if="selectedUser.profilePicture && selectedUser.profilePicture !== '/default-profile.png'" 
+                v-if="selectedUser.profilePicture && selectedUser.profilePicture !== '/default-profile.png' && !imageErrorState[selectedUser.id]" 
                 :src="getProfilePictureUrl(selectedUser.profilePicture)" 
+                @error="handleImageError(selectedUser.id)"
                 :alt="selectedUser.fullName">
               <span v-else>
                 {{ getInitials(selectedUser.fullName) }}
@@ -533,25 +537,16 @@ async function deleteUser(event, user) {
 
 
 function getProfilePictureUrl(picturePath) {
-
-  if (!picturePath || picturePath === '/default-profile.png') {
-    return null; 
-  }
-
   if (picturePath.startsWith('http')) {
     return picturePath;
   }
-  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || '';
   return `${apiUrl.replace(/\/$/, '')}/${picturePath.replace(/^\//, '')}`;
 }
 
 const imageErrorState = ref({});
-const handleImageError = (event, userId) => {
-   if (event && event.target) {
-    event.target.style.display = 'none';
-  }
-
- imageErrorState.value[userId] = true;
+const handleImageError = (userId) => {
+  imageErrorState.value[userId] = true;
 };
 
 
@@ -1435,14 +1430,17 @@ onMounted(fetchUsers);
 
 
 .avatar-initial-large {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-    border-radius: 50%;
-  overflow: hidden;
-  display: inline-block;
+  line-height: 1;
+ width: 100%;
+ height: 100%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ background-color: #f0f2f5;
+ color: #495057;
+ font-weight: bold;
+ font-size: 0.9rem;
+ border-radius: 50%;
 }
 
 
