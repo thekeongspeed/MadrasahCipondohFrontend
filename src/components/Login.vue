@@ -4,7 +4,9 @@
     
     <div class="auth-content">
       <transition name="bounce" appear>
-        <img src="/logo-madrasah.png" alt="Logo Madrasah" class="login-logo" />
+         <router-link to="/">
+            <img src="/logo-madrasah.png" alt="Logo Madrasah" class="login-logo" />
+          </router-link>
       </transition>
       
       <transition name="slide-fade" appear>
