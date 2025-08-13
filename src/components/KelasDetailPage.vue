@@ -215,7 +215,7 @@
                 <i class="fas fa-spinner fa-spin"></i> Memuat absensi...
               </div>
               
-              <div v-else class="attendance-container">
+              <div v-else class="attendance-container" ref="attendanceContainerRef">
                 <div class="attendance-grid-wrapper">
                 <div class="attendance-grid"
                 :style="{ 'grid-template-columns': gridTemplateColumns }">
@@ -705,7 +705,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, inject } from 'vue';
+import { ref, onMounted, computed, watch, inject, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import EmojiPicker from 'vue3-emoji-picker';
@@ -729,6 +729,7 @@ const isSubmittingAttendance = ref(false);
 const selfAttendanceDate = ref(new Date().toISOString().slice(0, 10));
 const showEditModal = ref(false);
 const editingRecord = ref(null);
+const attendanceContainerRef = ref(null);
 
 
 // Enhanced class information
@@ -1679,11 +1680,16 @@ watch(() => route.params.namaKelas, (newKelas) => {
   }
 }, { immediate: true });
 
-onMounted(() => {
-  loadAllClassData();
+onMounted(async() => {
+  await loadAllClassData();
   if (!isAdmin.value) {
-            checkSelfAttendanceStatus(selfAttendanceDate.value);
+         await   checkSelfAttendanceStatus(selfAttendanceDate.value);
         }
+  await nextTick();
+  if (attendanceContainerRef.value) {
+   
+   attendanceContainerRef.value.scrollLeft = 0;
+  }
 });
 </script>
 
@@ -2221,6 +2227,7 @@ onMounted(() => {
   background: #f8f9fa;
   font-weight: 600;
   color: #2c3e50;
+  position: sticky;
 }
 
 .name-cell {
@@ -2966,13 +2973,19 @@ onMounted(() => {
   }
   
   .name-cell {
-    min-width: 150px;
-    padding-left: 10px;
+    min-width: 10px;
+    padding: 10px 8px 10px 5px;
+  }
+  
+  .day-cell {
+    min-width: 35px;
+    padding: 8px 3px;
+    font-size: 0.9em;
   }
   
   .author-avatar {
-    width: 24px;
-    height: 24px;
+    width: 35px;
+    height: 35px;
     margin-right: 5px;
   }
   
