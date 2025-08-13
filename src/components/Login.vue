@@ -205,6 +205,14 @@ async function handleLogin() {
   width: 180px;
   margin-bottom: 1.5rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  height: auto;
+  transition: all 0.3s ease-in-out;
+  display: block;
+}
+
+.login-logo:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
 }
 
 .auth-card {

@@ -5,7 +5,9 @@
     <div class="auth-content">
       <transition name="bounce" appear>
         <div class="logo-container">
-          <img src="/logo-madrasah.png" alt="Logo Madrasah" class="login-logo" />
+           <router-link to="/">
+            <img src="/logo-madrasah.png" alt="Logo Madrasah" class="login-logo" />
+          </router-link>
           <h1 class="institution-name">Madrasah Cipondoh</h1>
         </div>
       </transition>
@@ -490,6 +492,15 @@ async function handleRegister() {
 .login-logo {
   width: 120px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  height:auto;
+  transition: all 0.3s ease-in-out;
+  display: block;
+  margin: 0;
+}
+
+.login-logo:hover {
+  transform: scale(1.1); 
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
 }
 
 .auth-card {
@@ -548,8 +559,9 @@ h2 {
   height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #f1f3f5;
+  border: 2px solid #b1b1b1;
   transition: all 0.3s ease;
+  display: block;
 }
 
 .profile-picture-preview.has-image {
