@@ -1178,10 +1178,10 @@ onMounted(fetchUsers);
 
 .modal-user-info {
   flex-grow: 1;
-  width: 100%; /* Pastikan mengambil lebar penuh */
+  width: 100%; 
   display: flex;
   flex-direction: column;
-  align-items: center; /* Pusatkan konten secara horizontal */
+  align-items: center; 
 }
 
 
@@ -1448,6 +1448,7 @@ onMounted(fetchUsers);
   width: 100%; 
   height: 100%;
   object-fit: cover; 
+  border-radius: 50%;
 }
 
 

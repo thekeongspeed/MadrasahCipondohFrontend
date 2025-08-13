@@ -592,6 +592,10 @@ watch(profileData, (newVal) => {
   height: 180px;
   margin-bottom: 1.5rem;
   cursor: pointer;
+  border-radius: 50%;
+  border: 5px solid white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .profile-avatar {
@@ -599,8 +603,6 @@ watch(profileData, (newVal) => {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  border: 5px solid white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
