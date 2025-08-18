@@ -2205,6 +2205,7 @@ onMounted(async() => {
   display: inline-grid;
   grid-template-columns: minmax(160px, 200px) repeat(var(--days-in-month), minmax(50px, 60px));
   border: 1px solid #e0e0e0;
+
 }
 
 .grid-header, .grid-row {
@@ -2232,23 +2233,24 @@ onMounted(async() => {
 
 .name-cell {
   justify-content: flex-start;
-  min-width: 200px;
+  min-width: 140px;
   position: sticky;
   left: 0;
   z-index: 2;
   background: white;
   box-shadow: 2px 0 3px rgba(0,0,0,0.1);
-  min-width: 150px;
-  padding-left: 10px;
+  padding: 10px 20px 0px 10px;
+  margin-right: 5px;
 }
 
 .day-cell {
   min-width: 30px;
-  height: 40px;
+  height: 50px;
+  
 }
 
 .row-cell.day-cell {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 
