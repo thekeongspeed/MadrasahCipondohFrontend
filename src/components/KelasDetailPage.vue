@@ -2205,7 +2205,7 @@ onMounted(async() => {
   display: inline-grid;
   grid-template-columns: minmax(160px, 200px) repeat(var(--days-in-month), minmax(50px, 60px));
   border: 1px solid #e0e0e0;
-
+  
 }
 
 .grid-header, .grid-row {
